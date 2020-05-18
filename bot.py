@@ -25,8 +25,7 @@ from itertools import cycle
 client = discord.Client()
 token = open("token.txt", "r").read() #open token.txt and enter your bot token. Without this bot will not be able to work. 
 ROLE = "Member" #You can change this to whatever you want in order for bot to assign role when member joins the server!
-url = "https://api.checkwx.com/metar/" #Metar URL DO NOT CHANGE THIS
-rule= "/decoded?pretty=1" #rule for decoded METAR data DO NOT CHANGE THIS!
+
 status = cycle(["with VASTIM Data", "what can I show you?", "Type !commands for help"]) #You can change this or disable it if you don't want to change status over time!
 airport = ["ICAO1", "ICAO2"] #Replace ICAO with ICAO code of airports in your FIR or vACC so bot can look up only listed airports
 
@@ -73,8 +72,7 @@ async def on_message(message, user: discord.User = None):
 
     #bookings display data
     tree = ET.fromstring(requests.get('http://vatbook.euroutepro.com/xml2.php?fir=').text)
-    #API Key for METAR API
-    hdr = { 'X-API-Key': 'Your-Api-Key-Goes-Here' }
+    
     # send request to vatsim data
     t = requests.get('http://cluster.data.vatsim.net/vatsim-data.json').json()
     xy = json.dumps(t)
@@ -157,215 +155,8 @@ async def on_message(message, user: discord.User = None):
         if not bookings_exists:
             await message.channel.send('```No ATC bookings found.```')
 
-    if message.content.startswith('!arrivals'):
-        ad = message.content[10:]
-        if ad in airport:
-            xy = json.dumps(t)
-            s = json.loads(xy)
-            arrivals_exist = False
-            for item in s['clients']:
-                if item['planned_destairport'] == ad:
-                    arrivals_exist = True
-
-                    lan = 0.0
-                    long = 0.0
-                    # Positions of the airports (LAT and LONG)
-                    if item['planned_destairport'] == "XXXX":#REPLACE ALL XXXX WITH CORRECT AIRPORT ICAO
-                        lan = 42.561389 #REPLACE THIS WITH CORRECT POSITION IN ORDER TO GET CORRECT ETA CALCULATIONS
-                        long = 18.268333
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 44.819444
-                        long = 20.306944
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 45.743056
-                        long = 16.068889
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 44.108333
-                        long = 15.346667
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 44.89361
-                        long = 13.922222
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 43.538889
-                        long = 16.298056
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 45.462778
-                        long = 18.810278
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 45.216944
-                        long = 14.570278
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 46.224444
-                        long = 14.456111
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 46.479722
-                        long = 15.686111
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 45.473353
-                        long = 13.614978
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 42.359444
-                        long = 19.251944
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 45.147778
-                        long = 21.309722
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 42.404722
-                        long = 18.723333
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 43.337222
-                        long = 21.853611
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 43.818611
-                        long = 20.585278
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 43.898886
-                        long = 19.697683
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 41.961111
-                        long = 21.626944
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 41.18
-                        long = 20.742222
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 41.414722
-                        long = 19.720556
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 43.824722
-                        long = 18.331389
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 43.282778
-                        long = 17.845833
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 44.936111
-                        long = 17.299167
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 44.458611
-                        long = 18.724722
-                    elif item['planned_destairport'] == "XXXX":
-                        lan = 42.572778
-                        long = 21.035833
-
-                    # calculations
-
-                    lat1 = item['latitude'] * math.pi / 180
-                    lat2 = lan * math.pi / 180
-                    lon1 = item['longitude'] * math.pi / 180
-                    lon2 = long * math.pi / 180
-
-                    dlat = lat2 - lat1
-                    dlon = lon2 - lon1
-
-                    R = (6371 * 1000) / 1852
-                    a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2) * math.sin(dlon/2)
-
-                    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-
-                    distance = R * c
-
-                    if item['groundspeed'] < 70:
-                        if distance < 10:
-                            departures_exist = True
-                            arr1e1 = discord.Embed(colour = discord.Colour.green())
-                            arr1e1.set_author(name="VATAdria Arrivals")
-                            arr1e1.add_field(name="Callsign", value=item['callsign'], inline=False)
-                            arr1e1.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
-                            arr1e1.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
-                            arr1e1.add_field(name="Status", value="Arrived at destination", inline=False)
-                            arr1e1.add_field(name="Route", value=item['planned_route'], inline=False)
-                            await message.channel.send(embed=arr1e1)
-                        else:
-                            arr2e2 = discord.Embed(colour = discord.Colour.dark_gold())
-                            arr2e2.set_author(name="VATAdria Arrivals")
-                            arr2e2.add_field(name="Callsign", value=item['callsign'], inline=False)
-                            arr2e2.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
-                            arr2e2.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
-                            arr2e2.add_field(name="Status", value="Preparing for the flight", inline=False)
-                            arr2e2.add_field(name="Route", value=item['planned_route'], inline=False)
-                            await message.channel.send(embed=arr2e2)
-                    else:
-                        time = distance / item['groundspeed']
-
-                        hour = int(time)
-                        arrival_hour = utc.hour + hour
-                        arrival_minute = utc.minute + int((time - int(time))*60)
-                        if arrival_minute > 59:
-                            add_hour = int(arrival_minute / 60)
-                            arrival_minute = int(((arrival_minute / 60) - add_hour) * 60)
-                            arrival_hour = arrival_hour + add_hour
-                            if arrival_hour > 23:
-                                days = int(arrival_hour / 24)
-                                arrival_hour = (arrival_hour - (days * 24))
-                                if days == 1:
-                                    if arrival_minute < 10:
-                                        arr3e3 = discord.Embed(colour = discord.Colour.blue())
-                                        arr3e3.set_author(name="VATAdria Arrivals")
-                                        arr3e3.add_field(name="Callsign", value=item['callsign'], inline=False)
-                                        arr3e3.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
-                                        arr3e3.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
-                                        arr3e3.add_field(name="Status", value="On the way", inline=False)
-                                        arr3e3.add_field(name="Arrival Time", value=f"{arrival_hour}:0{arrival_minute}z tommorow", inline=False)
-                                        arr3e3.add_field(name="Route", value=item['planned_route'], inline=False)
-                                        await message.channel.send(embed=arr3e3)
-                                    else:
-                                        arr4e4 = discord.Embed(colour = discord.Colour.blue())
-                                        arr4e4.set_author(name="VATAdria Arrivals")
-                                        arr4e4.add_field(name="Callsign", value=item['callsign'], inline=False)
-                                        arr4e4.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
-                                        arr4e4.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
-                                        arr4e4.add_field(name="Status", value="On the way", inline=False)
-                                        arr4e4.add_field(name="Arrival Time", value=f"{arrival_hour}:{arrival_minute}z tommorow", inline=False)
-                                        arr4e4.add_field(name="Route", value=item['planned_route'], inline=False)
-                                        await message.channel.send(embed=arr4e4)
-                                else:
-                                    if arrival_minute < 10:
-                                        arr5e5 = discord.Embed(colour = discord.Colour.blue())
-                                        arr5e5.set_author(name="VATAdria Arrivals")
-                                        arr5e5.add_field(name="Callsign", value=item['callsign'], inline=False)
-                                        arr5e5.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
-                                        arr5e5.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
-                                        arr5e5.add_field(name="Status", value="On the way", inline=False)
-                                        arr5e5.add_field(name="Arrival Time", value=f"{days}:{arrival_hour}:0{arrival_minute}z", inline=False)
-                                        arr5e5.add_field(name="Route", value=item['planned_route'], inline=False)
-                                        await message.channel.send(embed=arr5e5)
-                                    else:
-                                        arr6e6 = discord.Embed(colour = discord.Colour.blue())
-                                        arr6e6.set_author(name="VATAdria Arrivals")
-                                        arr6e6.add_field(name="Callsign", value=item['callsign'], inline=False)
-                                        arr6e6.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
-                                        arr6e6.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
-                                        arr6e6.add_field(name="Status", value="On the way", inline=False)
-                                        arr6e6.add_field(name="Arrival Time", value=f"{days}:{arrival_hour}:{arrival_minute}z", inline=False)
-                                        arr6e6.add_field(name="Route", value=item['planned_route'], inline=False)
-                                        await message.channel.send(embed=arr6e6)
-                        if arrival_minute < 10:
-                                        arr7e7 = discord.Embed(colour = discord.Colour.blue())
-                                        arr7e7.set_author(name="VATAdria Arrivals")
-                                        arr7e7.add_field(name="Callsign", value=item['callsign'], inline=False)
-                                        arr7e7.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
-                                        arr7e7.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
-                                        arr7e7.add_field(name="Status", value="On the way", inline=False)
-                                        arr7e7.add_field(name="Arrival Time", value=f"{arrival_hour}:0{arrival_minute}z", inline=False)
-                                        arr7e7.add_field(name="Route", value=item['planned_route'], inline=False)
-                                        await message.channel.send(embed=arr7e7)
-                        else:
-                                        arr8e8 = discord.Embed(colour = discord.Colour.blue())
-                                        arr8e8.set_author(name="VATAdria Arrivals")
-                                        arr8e8.add_field(name="Callsign", value=item['callsign'], inline=False)
-                                        arr8e8.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
-                                        arr8e8.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
-                                        arr8e8.add_field(name="Status", value="On the way", inline=False)
-                                        arr8e8.add_field(name="Arrival Time", value=f"{arrival_hour}:{arrival_minute}z", inline=False)
-                                        arr8e8.add_field(name="Route", value=item['planned_route'], inline=False)
-                                        await message.channel.send(embed=arr8e8)
-
-            if not arrivals_exist:
-                await message.channel.send('**There is no arrivals at the moment!**')
-        else:
-            await message.channel.send('**Please provide ICAO code within VATAdria!**')
-
     # Display arrivals to all airports
-    if message.content.startswith('!allarrivals'):
+    if message.content.startswith('!arrivals'):
         arrivals_exist = False
         for item in s['clients']:
             if item['planned_destairport'] in airport:
@@ -566,26 +357,6 @@ async def on_message(message, user: discord.User = None):
         if not arrivals_exist:
             await message.channel.send('**There is no arrivals at the moment!**')
 
-#Display filtered airport data keep in mind I placed filter to only allow aiports in aiport data, you can remove it if you want!
-    if message.content.startswith('!departures'):
-        ad1 = message.content[12:]
-        if ad1 in airport:
-            departures_exist = False
-            for item in s['clients']:
-                if item['planned_depairport'] == ad1:
-                    departures_exist = True
-                    depe = discord.Embed(colour = discord.Colour.green())
-                    depe.set_author(name="VATAdria Departures")
-                    depe.add_field(name="Callsign", value=item['callsign'], inline=False)
-                    depe.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
-                    depe.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
-                    depe.add_field(name="Planned Dep Time", value=f"{item['planned_deptime']}z", inline=False)
-                    depe.add_field(name="Route", value=item['planned_route'], inline=False)
-                    await message.channel.send(embed=depe)
-            if not departures_exist:
-                await message.channel.send('**There is no departures at the moment!**')
-        else:
-            await message.channel.send('**Please provide ICAO code within XXXXXX**')
 # Display all departures from all airports 
     if message.content.startswith('!departures'):
         departures_exist = False
@@ -655,50 +426,6 @@ async def on_message(message, user: discord.User = None):
         cone.add_field(name="Training Department", value="**INSERT VALID EMAIL ADRESS**", inline=False)
         cone.add_field(name="Events", value="**INSERT VALID EMAIL ADRESS**", inline=False)
         await message.channel.send(embed=cone)
-
-    #METAR display
-    if message.content.startswith('!metar'):
-        icao = message.content[7:]
-        final_url = f"{url}{icao}{rule}"
-        req = requests.get(final_url, headers=hdr).json()
-        xi = json.dumps(req)
-        d = json.loads(xi)
-        for item in d['data']:
-            if item['wind']['speed_kts'] < 10:
-                if item['wind']['degrees'] == 0:
-                    mete = discord.Embed(title="Metar Info", colour = discord.Colour.dark_gold())
-                    mete.set_author(name="VATAdria")
-                    mete.add_field(name="Airport", value=f"{item['station']['name']}", inline=False)
-                    mete.add_field(name="Raw Metar", value=f"{item['raw_text']}", inline=False)
-                    mete.add_field(name="Winds", value=f"VRB0{item['wind']['speed_kts']}KT", inline=False)
-                    mete.add_field(name="Visibility", value=f"{item['visibility']['meters_float']}", inline=False)
-                    mete.add_field(name="Temperature", value=f"{item['temperature']['celsius']}", inline=False)
-                    mete.add_field(name="Dew Point", value=f"{item['dewpoint']['celsius']}", inline=False)
-                    mete.add_field(name="QNH", value=f"{item['barometer']['hpa']}", inline=False)
-                    await message.channel.send(embed=mete)
-                else:
-                    mete1 = discord.Embed(title="Metar Info", colour = discord.Colour.dark_gold())
-                    mete1.set_author(name="VATAdria")
-                    mete1.add_field(name="Airport", value=f"{item['station']['name']}", inline=False)
-                    mete1.add_field(name="Raw Metar", value=f"{item['raw_text']}", inline=False)
-                    mete1.add_field(name="Winds", value=f"{item['wind']['degrees']}0{item['wind']['speed_kts']}KT", inline=False)
-                    mete1.add_field(name="Visibility", value=f"{item['visibility']['meters_float']}", inline=False)
-                    mete1.add_field(name="Temperature", value=f"{item['temperature']['celsius']}", inline=False)
-                    mete1.add_field(name="Dew Point", value=f"{item['dewpoint']['celsius']}", inline=False)
-                    mete1.add_field(name="QNH", value=f"{item['barometer']['hpa']}", inline=False)
-                    await message.channel.send(embed=mete1)
-            else:
-                mete2 = discord.Embed(title="Metar Info", colour = discord.Colour.dark_gold())
-                mete2.set_author(name="VATAdria")
-                mete2.add_field(name="Airport", value=f"{item['station']['name']}", inline=False)
-                mete2.add_field(name="Raw Metar", value=f"{item['raw_text']}", inline=False)
-                mete2.add_field(name="Winds", value=f"{item['wind']['degrees']}{item['wind']['speed_kts']}KT", inline=False)
-                mete2.add_field(name="Visibility", value=f"{item['visibility']['meters_float']}", inline=False)
-                mete2.add_field(name="Temperature", value=f"{item['temperature']['celsius']}", inline=False)
-                mete2.add_field(name="Dew Point", value=f"{item['dewpoint']['celsius']}", inline=False)
-                mete2.add_field(name="QNH", value=f"{item['barometer']['hpa']}", inline=False)
-                await message.channel.send(embed=mete2)
-
 
 # Login with bot on Discord!
 client.run(token) 
