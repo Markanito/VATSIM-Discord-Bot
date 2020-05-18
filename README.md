@@ -22,6 +22,10 @@ If you want to take a look of fully working bot, you can join our Discord server
 
 If you have any questions feel free to contact me via email: marko.tomicic@vatadria.net or via Discord: Markan#4169
 
+## How to host the bot for free?
+I included proc and requirements files so you can host this bot without problems. Heroku offers free hosting for this bot so head over to: https://heroku.com/ and sign up (it is 100% free but there is payed versions as well for more functions). 
+There is tutorial on how to deploy your bot on heroku there it should take 10 min max for the first time setup.
+
 Happy coding and enjoy our bot. 
 
 P.S. Expect future updates to code once when other functions get implemented.
