@@ -10,6 +10,19 @@ In order to modify this bot to suit your needs (it won't work out of box) you wi
 * ElementTree
 * Asyncio
 
+## Features
+Following commands are already defined and tested:
+* !online (disply online ATC for predefined station)
+* !bookings (display bookings for predifined stations)
+* !arrivals ICAO (display arrivals into selected airport) Keep in mind you can restrict which airports you want to show!
+* !allarrivals (dsiplay all arrivals into predifined airport list)
+* !departures ICAO (display departures from selected airport) Keep in mind you can restrict which airports you want to show!
+* !metar ICAO (display METAR for selected airport) Keep in mind you can restrict which airports you want to show!
+* !time (Displays server time where bot is hosted)
+* !ver (display version of the bot)
+* !changelog (display changelog to member so they can see what is new in the bot). You can remove this if you want
+* !contact (display all contact info for your vACC)
+
 ## Modifying bot
 In VCS you will need to make some changes so bot can filter VATSIM Data for your needs. You will need following data:
 * ATC station ICAO (include all stations and prefixes such as XXXX_U_CTR, XXXX_SC_CTR, etc)
@@ -31,7 +44,5 @@ Happy coding and enjoy our bot.
 P.S. Expect future updates to code once when other functions get implemented.
 List of futre plans:
 - Automatic messages when ATC station goes online or offline
-- Filtering arrival and departure data by ICAO
-- Implementing METAR command (decoded and undecoded data will be provided)
 
-Keep an eye on future code updates in order to stay up to date. If you make any changes that you would like to share it with the world feel free to reach out to me.
+
