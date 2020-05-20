@@ -28,7 +28,8 @@ In VCS you will need to make some changes so bot can filter VATSIM Data for your
 * ATC station ICAO (include all stations and prefixes such as XXXX_U_CTR, XXXX_SC_CTR, etc)
 * ICAO code for airports within FIR or vACC
 * Coordinates of airports (this is for calculation of ETA)
-* Discord bot token (you can find how to make bot simply by googling it)
+* Discord bot token (simply create new Discord app here: https://discord.com/developers/applications)
+* You will need METAR API Key (It is free for up to 2000 requests per day and you can get it here: https://www.checkwx.com/)
 
 ## Example
 If you want to take a look of fully working bot, you can join our Discord server here: https://discord.gg/nsBQcdY
