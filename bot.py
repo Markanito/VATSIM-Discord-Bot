@@ -107,23 +107,23 @@ async def on_message(message, user: discord.User = None):
             time_end = atcs.find('time_end').text
             booking_start = datetime.strptime(time_start, '%Y-%m-%d %H:%M:%S')
             booking_end = datetime.strptime(time_end, '%Y-%m-%d %H:%M:%S')
-            if (booking_start - datetime.today()).days == 0 and callsign in atc:
+            if (booking_start.day - datetime.today.day()) == 0 and callsign in atc:
                 bookings_exists = True
-                if booking_start.minute <10 and booking_end.minute <10 and booking_end.start.month <10:
+                if booking_start.minute <10 and booking_end.minute <10 and booking_end.month <10:
                     boke = discord.Embed(colour = discord.Colour.dark_red())
                     boke.set_author(name='ATC Bookings')
                     boke.add_field(name='Position', value=f"{(callsign)}", inline=False)
                     boke.add_field(name='Date', value=f"{booking_start.day}.0{booking_start.month}.{booking_start.year}", inline=False)
-                    boke.add_field(name="Start Time", value=f"{booking_start.hour}:0{booking_start.minute}Z", inline=False)
-                    boke.add_field(name='End Time', value=f"{booking_end.hour}:0{booking_end.minute}Z", inline=False)
+                    boke.add_field(name="Start Time", value=f"{booking_start.hour}:0{booking_start.minute}z", inline=False)
+                    boke.add_field(name='End Time', value=f"{booking_end.hour}:0{booking_end.minute}z", inline=False)
                     await message.channel.send(embed=boke)
                 else: 
                     boke1 = discord.Embed(colour = discord.Colour.dark_red())
                     boke1.set_author(name='ATC Bookings')
                     boke1.add_field(name='Position', value=f"{(callsign)}", inline=False)
                     boke1.add_field(name='Date', value=f"{booking_start.day}.{booking_start.month}.{booking_start.year}", inline=False)
-                    boke1.add_field(name="Start Time", value=f"{booking_start.hour}:{booking_start.minute}Z", inline=False)
-                    boke1.add_field(name='End Time', value=f"{booking_end.hour}:{booking_end.minute}Z", inline=False)
+                    boke1.add_field(name="Start Time", value=f"{booking_start.hour}:{booking_start.minute}z", inline=False)
+                    boke1.add_field(name='End Time', value=f"{booking_end.hour}:{booking_end.minute}z", inline=False)
                     await message.channel.send(embed=boke1)
         if not bookings_exists:
             await message.channel.send('```No ATC bookings found.```')
@@ -143,16 +143,16 @@ async def on_message(message, user: discord.User = None):
                     boka.set_author(name='ATC Bookings')
                     boka.add_field(name='Position', value=f"{(callsign)}", inline=False)
                     boka.add_field(name='Date', value=f"{booking_start.day}.0{booking_start.month}.{booking_start.year}", inline=False)
-                    boka.add_field(name="Start Time", value=f"{booking_start.hour}:0{booking_start.minute}Z", inline=False)
-                    boka.add_field(name='End Time', value=f"{booking_end.hour}:0{booking_end.minute}Z", inline=False)
+                    boka.add_field(name="Start Time", value=f"{booking_start.hour}:0{booking_start.minute}z", inline=False)
+                    boka.add_field(name='End Time', value=f"{booking_end.hour}:0{booking_end.minute}z", inline=False)
                     await message.channel.send(embed=boka)
                 else:
                     boka1 = discord.Embed(colour = discord.Colour.dark_red())
                     boka1.set_author(name='ATC Bookings')
                     boka1.add_field(name='Position', value=f"{(callsign)}", inline=False)
                     boka1.add_field(name='Date', value=f"{booking_start.day}.{booking_start.month}.{booking_start.year}", inline=False)
-                    boka1.add_field(name="Start Time", value=f"{booking_start.hour}:{booking_start.minute}Z", inline=False)
-                    boka1.add_field(name='End Time', value=f"{booking_end.hour}:{booking_end.minute}Z", inline=False)
+                    boka1.add_field(name="Start Time", value=f"{booking_start.hour}:{booking_start.minute}z", inline=False)
+                    boka1.add_field(name='End Time', value=f"{booking_end.hour}:{booking_end.minute}z", inline=False)
                     await message.channel.send(embed=boka1)
         if not bookings_exists:
             await message.channel.send('```No ATC bookings found.```')
@@ -508,7 +508,7 @@ async def on_message(message, user: discord.User = None):
                                     arr3e.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
                                     arr3e.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
                                     arr3e.add_field(name="Status", value="On the way", inline=False)
-                                    arr3e.add_field(name="Arrival Time", value=f"{arrival_hour}:0{arrival_minute}Z tommorow", inline=False)
+                                    arr3e.add_field(name="Arrival Time", value=f"{arrival_hour}:0{arrival_minute}z tommorow", inline=False)
                                     arr3e.add_field(name="Route", value=item['planned_route'], inline=False)
                                     await message.channel.send(embed=arr3e)
                                 else:
@@ -518,7 +518,7 @@ async def on_message(message, user: discord.User = None):
                                     arr4e.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
                                     arr4e.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
                                     arr4e.add_field(name="Status", value="On the way", inline=False)
-                                    arr4e.add_field(name="Arrival Time", value=f"{arrival_hour}:{arrival_minute}Z tommorow", inline=False)
+                                    arr4e.add_field(name="Arrival Time", value=f"{arrival_hour}:{arrival_minute}z tommorow", inline=False)
                                     arr4e.add_field(name="Route", value=item['planned_route'], inline=False)
                                     await message.channel.send(embed=arr4e)
                             else:
@@ -529,7 +529,7 @@ async def on_message(message, user: discord.User = None):
                                     arr5e.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
                                     arr5e.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
                                     arr5e.add_field(name="Status", value="On the way", inline=False)
-                                    arr5e.add_field(name="Arrival Time", value=f"{days}:{arrival_hour}:0{arrival_minute}Z", inline=False)
+                                    arr5e.add_field(name="Arrival Time", value=f"{days}:{arrival_hour}:0{arrival_minute}z", inline=False)
                                     arr5e.add_field(name="Route", value=item['planned_route'], inline=False)
                                     await message.channel.send(embed=arr5e)
                                 else:
@@ -539,7 +539,7 @@ async def on_message(message, user: discord.User = None):
                                     arr6e.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
                                     arr6e.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
                                     arr6e.add_field(name="Status", value="On the way", inline=False)
-                                    arr6e.add_field(name="Arrival Time", value=f"{days}:{arrival_hour}:{arrival_minute}Z", inline=False)
+                                    arr6e.add_field(name="Arrival Time", value=f"{days}:{arrival_hour}:{arrival_minute}z", inline=False)
                                     arr6e.add_field(name="Route", value=item['planned_route'], inline=False)
                                     await message.channel.send(embed=arr6e)
                     if arrival_minute < 10:
@@ -549,7 +549,7 @@ async def on_message(message, user: discord.User = None):
                                     arr7e.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
                                     arr7e.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
                                     arr7e.add_field(name="Status", value="On the way", inline=False)
-                                    arr7e.add_field(name="Arrival Time", value=f"{arrival_hour}:0{arrival_minute}Z", inline=False)
+                                    arr7e.add_field(name="Arrival Time", value=f"{arrival_hour}:0{arrival_minute}z", inline=False)
                                     arr7e.add_field(name="Route", value=item['planned_route'], inline=False)
                                     await message.channel.send(embed=arr7e)
                     else:
@@ -559,7 +559,7 @@ async def on_message(message, user: discord.User = None):
                                     arr8e.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
                                     arr8e.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
                                     arr8e.add_field(name="Status", value="On the way", inline=False)
-                                    arr8e.add_field(name="Arrival Time", value=f"{arrival_hour}:{arrival_minute}Z", inline=False)
+                                    arr8e.add_field(name="Arrival Time", value=f"{arrival_hour}:{arrival_minute}z", inline=False)
                                     arr8e.add_field(name="Route", value=item['planned_route'], inline=False)
                                     await message.channel.send(embed=arr8e)
 
@@ -597,7 +597,7 @@ async def on_message(message, user: discord.User = None):
                 depe.add_field(name="Callsign", value=item['callsign'], inline=False)
                 depe.add_field(name="Departure Airport", value=item['planned_depairport'], inline=False)
                 depe.add_field(name="Destination Airport", value=item['planned_destairport'], inline=False)
-                depe.add_field(name="Planned Dep Time", value=f"{item['planned_deptime']}Z", inline=False)
+                depe.add_field(name="Planned Dep Time", value=f"{item['planned_deptime']}z", inline=False)
                 depe.add_field(name="Route", value=item['planned_route'], inline=False)
                 await message.channel.send(embed=depe)
         if not departures_exist:
@@ -621,8 +621,8 @@ async def on_message(message, user: discord.User = None):
         come.add_field(name="Show online ATC", value="**!online**", inline=False,)
         come.add_field(name="Show all arrivals", value="**!arrivals**", inline=False)
         come.add_field(name="Show all departures", value="**!departures**", inline=False)
-        come.add_field(name="Display future ATC bookings", value="*!allbookings*", inline=False)
-        come.add_field(name="Display ATC bookings for today", value="*!bookings*", inline=False)
+        come.add_field(name="Display future ATC bookings", value="**!allbookings**", inline=False)
+        come.add_field(name="Display ATC bookings for today", value="**!bookings**", inline=False)
         come.add_field(name="Sector file link", value="**!sectorfile**", inline=False)
         come.add_field(name="Bot version", value="**!ver**", inline=False)
         come.add_field(name="Changelog", value="**!changelog**", inline=False)
