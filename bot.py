@@ -664,6 +664,18 @@ async def on_message(message, user: discord.User = None):
         xi = json.dumps(req)
         d = json.loads(xi)
         for item in d['data']:
+            if item['wind'] in d['data'] == False:
+                mete3 = discord.Embed(title="Metar Info", colour = discord.Colour.dark_gold())
+                mete3.set_author(name="VATAdria")
+                mete3.add_field(name="Airport", value=f"{item['station']['name']}", inline=False)
+                mete3.add_field(name="Raw Metar", value=f"{item['raw_text']}", inline=False)
+                mete3.add_field(name="Winds", value="00000KT", inline=False)
+                mete3.add_field(name="Visibility", value=f"{item['visibility']['meters_float']}", inline=False)
+                mete3.add_field(name="Temperature", value=f"{item['temperature']['celsius']}", inline=False)
+                mete3.add_field(name="Dew Point", value=f"{item['dewpoint']['celsius']}", inline=False)
+                mete3.add_field(name="QNH", value=f"{item['barometer']['hpa']}", inline=False)
+                mete3.add_field(name="Flight Category", value=f"{item['flight_category']}", inline=False)
+                await message.channel.send(embed=mete3)
             if item['wind']['speed_kts'] < 10:
                 if item['wind']['degrees'] == 0:
                     mete = discord.Embed(title="Metar Info", colour = discord.Colour.dark_gold())
