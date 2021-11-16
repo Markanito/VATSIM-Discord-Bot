@@ -1,49 +1,19 @@
-# VATSIM-Discord-Bot
-## Discord bot to display online ATC, departures, arrivals and future bookings!
+# Discord-Bot
+
+VATSIM Adria Discord v3 now being developed. Most of the changes in this bot will be in main bot file as Database will be introduced in order to allow bot to be connected with other servers as well.
+
+# FEATURES
+This bot is much more then just random Python script, we evolved from the first 730 lines of code with dumb commands and code which repeats all over and makes code messy.
+Introduced command and error handlers in order to make sure peoples are using commands which exists and if command in not found it will throw an error. In this version we 
+managed to make announcements for ATC and Bookings and also introduced staff commands to keep vACC messages behind the bot. This is not the end we are working on the logging part of the 
+code which will allow Discord Admins to check what other members are up to and if there is any reason for suspensions. Also, logging feature will help when messages get deleted by
+Staff so admins can check message content once when message is deleted and have a better version of Audit Log available on their hands.
+
+You can check METAR, online controllers, departures and arrivals with ETA calculations (more info will be added soon) so you don't need to go on any external websites and you can 
+have this data on the palm of your hands while talking with friends, VATSIM members or doing any online activities. 
 
 
-## Requirements
-In order to modify this bot to suit your needs (it won't work out of box) you will need:
-* Visual Studio Code (VCS)
-* Discord.py
-* Requests
-* ElementTree
-* Asyncio
-
-## Features
-Following commands are already defined and tested:
-* !online (disply online ATC for predefined station)
-* !bookings (display bookings for predifined stations)
-* !arrivals ICAO (display arrivals into selected airport) Keep in mind you can restrict which airports you want to show!
-* !allarrivals (dsiplay all arrivals into predifined airport list)
-* !departures ICAO (display departures from selected airport) Keep in mind you can restrict which airports you want to show!
-* !metar ICAO (display METAR for selected airport) Keep in mind you can restrict which airports you want to show!
-* !time (Displays server time where bot is hosted)
-* !ver (display version of the bot)
-* !changelog (display changelog to member so they can see what is new in the bot). You can remove this if you want
-* !contact (display all contact info for your vACC)
-
-## Modifying bot
-In VCS you will need to make some changes so bot can filter VATSIM Data for your needs. You will need following data:
-* ATC station ICAO (include all stations and prefixes such as XXXX_U_CTR, XXXX_SC_CTR, etc)
-* ICAO code for airports within FIR or vACC
-* Coordinates of airports (this is for calculation of ETA)
-* Discord bot token (simply create new Discord app here: https://discord.com/developers/applications)
-* You will need METAR API Key (It is free for up to 2000 requests per day and you can get it here: https://www.checkwx.com/)
-
-## Example
-If you want to take a look of fully working bot, you can join our Discord server here: https://discord.gg/nsBQcdY
-
-If you have any questions feel free to contact me via email: marko.tomicic@vatadria.net or via Discord: Markan#4169
-
-## How to host the bot for free?
-I included proc and requirements files so you can host this bot without problems. Heroku offers free hosting for this bot so head over to: https://heroku.com/ and sign up (it is 100% free but there is payed versions as well for more functions). 
-There is tutorial on how to deploy your bot on heroku there it should take 10 min max for the first time setup.
-
-Happy coding and enjoy our bot. 
-
-P.S. Expect future updates to code once when other functions get implemented.
-List of futre plans:
-- Automatic messages when ATC station goes online or offline
-
-
+# HOSTING
+This bot is hosted on Linux server which runs 24/7/365 to ensure 100% up time of the bot. If there is any changes to the bot you can simply reload the cogs and all commands and events
+will be updated without bot restart. More work needs to be done here so we can send a message to special Admin channel when bot restarts and loads cogs to make sure that it is up and 
+running. Some code optimisation will happen over time as we get more time on our hands so we can have this bot so powerfull and simple to use for all members accross VATSIM.
