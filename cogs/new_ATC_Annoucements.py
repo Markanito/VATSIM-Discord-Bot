@@ -34,7 +34,7 @@ class atcAnnoucements(Cog):
     @tasks.loop(minutes=5)
     async def atcAnnoucements(self):
         try:
-            channel = self.bot.get_channel(806457781032714280) #Replace the ID of the channel here
+            channel = self.bot.get_channel(806457781032714280)
             online_2_cs = []
             online_2_obj = []
             r = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
@@ -58,7 +58,7 @@ class atcAnnoucements(Cog):
             for i in online_2_obj:
                 if i.get_callsign() not in online_cs:
                     #Check if controller is connected on primary frequency before continuing the loop
-                    if frequency == "199.998":
+                    if i.get_frequency() == "199.998":
                         pass
 
                     else:

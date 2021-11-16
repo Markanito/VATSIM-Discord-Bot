@@ -50,12 +50,11 @@ class atcBookings(Cog):
                 booking_end = datetime.strptime(time_end, '%Y-%m-%d %H:%M:%S')
                 bookings_start_time = booking_start.strftime('%H:%M')
                 bookings_end_time = booking_end.strftime('%H:%M')
-                bookings_date = booking_start.strftime('%m.%d.%Y')
                 
                 for i in callsign_prefix:
                     if i == callsign[:len(i)] and callsign[-3:] in positions:
                         if (booking_start.day - datetime.now().day) == 0:
-                            controller_obj = Controller(callsign, booked, bookings_end_time, bookings_start_time)
+                            controller_obj = Controller(callsign, booked, bookings_start_time, bookings_end_time)
                             booked_2_obj.append(controller_obj)
                             booked_2_cs.append(callsign)
                         else:
@@ -67,8 +66,8 @@ class atcBookings(Cog):
                     booked_cs.append(i.get_callsign())
                     bokembed = discord.Embed(title="VATAdria Booking Annoucement", description="New booking found for today!", colour = discord.Colour.dark_red())
                     bokembed.add_field(name=':radio: Position', value=f"`{i.get_callsign()}`", inline=False)
-                    bokembed.add_field(name=":timer: Start Time", value=f"`{i.bookings_start}z`", inline=False)
-                    bokembed.add_field(name=':timer: End Time', value=f"`{i.bookings_end}z`", inline=False)
+                    bokembed.add_field(name=":timer: Start Time", value=f"`{i.get_bookings_start()}z`", inline=False)
+                    bokembed.add_field(name=':timer: End Time', value=f"`{i.get_bookings_end()}z`", inline=False)
                     bokembed.set_footer(
                         text =f"Booked by: {i.get_booked()}"
                         )
