@@ -5,11 +5,15 @@ from datetime import datetime, timezone, date, timedelta
 import requests
 import time
 import json
+import utils.json_loader
 
 with open("callsign_prefix.json") as json_file:
     callsign_prefix = json.load(json_file)
 positions = ["GND","TWR","APP","CTR"]
 online_cs = []
+
+bot_config_file = utils.json_loader.read_json("config")
+atc_channel_id = bot_config_file["atc_channel"]
 
 class Controller():
     def __init__(self, callsign, controller_name, frequency):
@@ -34,7 +38,7 @@ class atcAnnoucements(Cog):
     @tasks.loop(minutes=5)
     async def atcAnnoucements(self):
         try:
-            channel = self.bot.get_channel(806457781032714280)
+            channel = self.bot.get_channel(atc_channel_id)
             online_2_cs = []
             online_2_obj = []
             r = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
@@ -70,17 +74,6 @@ class atcAnnoucements(Cog):
                         onlineEmbed.add_field(name=":radio: Frequency", value=f"`{i.get_frequency()}`", inline=False)
                         onlineEmbed.set_footer(text=f"Logged on at: {time_logg}z")
                         await channel.send(embed=onlineEmbed)
-
-            #Controller Change
-            for i in online_cs:
-                if i.get_controller_name() not in online_cs:
-                    online_cs.append(i.get_controller_name())
-                    changeEmbed = Embed(title="ATC Annoucement", description=f"Controller Changed at {i.get_callsign()}!", color=0x00ff4c)
-                    changeEmbed.add_field(name=":man: New Controller", value=f"{i.get_controller_name()}", inline=False)
-                    changeEmbed.set_footer(text=f"Logged on at: {time_logg}z")
-                    await channel.send(embed=changeEmbed)
-
-
 
             #Controller Offline
             for i in online_cs:

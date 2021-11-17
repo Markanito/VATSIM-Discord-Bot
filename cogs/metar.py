@@ -3,18 +3,22 @@ import requests
 import json
 from discord.ext.commands import Cog, command
 from datetime import datetime, timezone, date, time
+import utils.json_loader
 
-guilds_ids = [692681048798265344, 572740040229388288]
+bot_config_file = utils.json_loader.read_json("config")
+checkwxapikey = bot_config_file["checkwx_api_key"]
+
+
 url = "https://api.checkwx.com/metar/"
 rule= "/decoded?pretty=1"
-hdr = { 'X-API-Key': 'Insert you CheckWX API Key Here' }
+hdr = { 'X-API-Key': checkwxapikey }
 
 class metar(Cog):
 
     def __init__(self, bot):
         self.bot = bot
 
-    @command(name="metar", description="Get decoded METAR for <ICAO> airport", guild_ids=guilds_ids)
+    @command(name="metar", description="Get decoded METAR for <ICAO> airport")
     async def metar(self, ctx, *, ICAO: str):
 
         final_url = f"{url}{ICAO}{rule}"
