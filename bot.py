@@ -38,6 +38,7 @@ async def get_prefix(bot, message):
 
 DEFAULTPREFIX = "!"
 secret_file = utils.json_loader.read_json("secrets")
+
 bot = commands.Bot(
     command_prefix=get_prefix,
     case_insensitive=True,
@@ -52,7 +53,8 @@ logging.basicConfig(level=logging.INFO)
 
 bot.DEFAULTPREFIX = DEFAULTPREFIX
 bot.cwd = cwd
-
+bot.blacklisted_users = []
+bot.muted_users = {}
 bot.version = "3.0"
 
 #Colors for the bot, so we don't need to request it from other sources
