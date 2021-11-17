@@ -5,6 +5,11 @@ import json
 import xml.etree.ElementTree as ET
 import requests
 from datetime import datetime, timezone, date, time
+import utils.json_loader
+
+bot_config_file = utils.json_loader.read_json("config")
+bookings_channel_id = bot_config_file["bookings_channel"]
+
 
 with open("callsign_prefix.json") as json_file:
     callsign_prefix = json.load(json_file)
@@ -37,7 +42,7 @@ class atcBookings(Cog):
     @tasks.loop(minutes=1)
     async def newBooking(self):
         try:
-            channel = self.bot.get_channel(781834455765483562)
+            channel = self.bot.get_channel(bookings_channel_id)
             booked_2_cs = []
             booked_2_obj = []
             tree = ET.fromstring(requests.get('http://vatbook.euroutepro.com/xml2.php?fir=').text)

@@ -22,8 +22,6 @@ print(f"{cwd}\n----")
 intents = discord.Intents.all()
 DEFAULTPREFIX = "!"
 secret_file = utils.json_loader.read_json("secrets")
-COGS = [path.split("/")[-1][:-3] for path in glob("./cogs/*.py")] #If you run this code on Windows machine make sure to replace [path.split("/")[-1][:-3] with [path.split("\\")[-1][:-3]
-
 
 async def get_prefix(bot, message):
     if not message.guild:
@@ -49,7 +47,6 @@ bot = commands.Bot(
 )
 
 bot.config_token = secret_file["token"]
-bot.connection_url = secret_file["mongo"]
 
 logging.basicConfig(level=logging.INFO)
 

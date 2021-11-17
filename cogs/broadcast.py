@@ -7,6 +7,13 @@ import discord.utils
 from discord.ext.commands.cooldowns import BucketType
 from discord.ext.commands import command, Cog
 from discord.ext.commands.core import check, cooldown, has_any_role
+import utils.json_loader
+
+
+bot_config_file = utils.json_loader.read_json("config")
+events_channel_id = bot_config_file["events_channel"]
+news_channel_id = bot_config_file["news_channel"]
+sector_file_channel_id = bot_config_file["sector_file_channel"]
 
 class broadcast(Cog):
     def __init__(self, bot):
@@ -32,7 +39,7 @@ class broadcast(Cog):
             await ctx.send('And now give me link to events picture.')
             picture = await self.bot.wait_for('message', check=check)
 
-            channel = self.bot.get_channel(805034956966592593)
+            channel = self.bot.get_channel(events_channel_id)
             evembed = Embed(title=title.content, url=url.content, description=desc.content, colour = Colour.green())
             evembed.set_image(url=picture.content)
             await channel.send(embed=evembed)
@@ -53,7 +60,7 @@ class broadcast(Cog):
             await ctx.send('What is new in this sector file?')
             updates = await self.bot.wait_for('message', check=check)
 
-            channel = self.bot.get_channel(652146473345220626)
+            channel = self.bot.get_channel(sector_file_channel_id)
             secembed = Embed(title=f'New sector file (Airac {airac.content}) is up and running', url="http://files.aero-nav.com/ADRIA", description =updates.content, color=0x0400ff)
             secembed.set_footer(text="Update guide at https://www.forum.vatadria.net/showthread.php?tid=487%22")
             await channel.send(embed=secembed)
@@ -67,7 +74,7 @@ class broadcast(Cog):
     async def genbroadcast(self, ctx, *, message: str):
         if len(message) == 0:
             await ctx.reply("Please provide message content for me to send!")
-        channel = self.bot.get_channel(806458731104698388)
+        channel = self.bot.get_channel(news_channel_id)
         with ctx.channel.typing():
             await channel.send(message)
             await ctx.message.delete()
@@ -81,7 +88,7 @@ class broadcast(Cog):
             await ctx.reply("Please provide message content for me to send!")
         else:
             with ctx.channel.typing():
-                channel = self.bot.get_channel(805034956966592593)
+                channel = self.bot.get_channel(events_channel_id)
                 await channel.send(message)
                 await ctx.message.delete()
                 await ctx.send(f"Push text sent, I deleted all messages to keep the channel clean. *This message will be deleted in 10 seconds!*", delete_after=10)
