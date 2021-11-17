@@ -1,17 +1,9 @@
 # VATSIM-Discord-Bot
-## VATSIM Discord bot which is designed for VATSIM-Adria Discord server is now available for every vACC to use. Down bellow you have a list of features you can use so please make sure to follow it as written bellow. This bot will be updated for an easier setup but I decided to share this new version with everyone to modify and use.
-
-VATSIM Adria Discord v3 now being developed. Most of the changes in this bot will be in main bot file as Database will be introduced in order to allow bot to be connected with other servers as well.
-
-# FEATURES
-This bot is much more then just random Python script, we evolved from the first 730 lines of code with dumb commands and code which repeats all over and makes code messy.
-Introduced command and error handlers in order to make sure peoples are using commands which exists and if command in not found it will throw an error. In this version we 
-managed to make announcements for ATC and Bookings and also introduced staff commands to keep vACC messages behind the bot. This is not the end we are working on the logging part of the 
-code which will allow Discord Admins to check what other members are up to and if there is any reason for suspensions. Also, logging feature will help when messages get deleted by
-Staff so admins can check message content once when message is deleted and have a better version of Audit Log available on their hands.
+## VATSIM Discord Bot is developed by VATSIM Adria members with a goal of displaying VATSIM related data on Discord server. With this version our bot got smarter, better and more powerfull in features that were once only a dream for us. When our first bot was released it was just a dumb python script with 700+ lines of unorganized mess in code and now it took form of standard Discord bot made for 21st century. 
 
 ## Features
-Since we started this project long ago we made huge improvements on how does bot perform and it is not stupid script anymore it is much more than that. Here are some of the features that this bot can do (more to come in future)
+Since we started this project long ago we made huge improvements on how does bot respond to commands and what it can do. In last period we dedicated time to optimize the code, make it easier to use and implemented a bunch of different commands for members, staff and Admins to use. 
+Here is short list of what this bot can do:
 *Display arrivals and departures from one or all airports under your vACC/ARTCC
 *Automatic ATC Bookings and Online announcements
 *Decoded METAR
@@ -22,23 +14,22 @@ Since we started this project long ago we made huge improvements on how does bot
 
 
 ## Modifying bot
-You will need to modify the bot code a bit until config file is published and implemented. You can also remove unneeded cogs from cogs folder but before you do make sure to check what is there and will you need that.
-So let's see what we need to edit:
-*airports.json - enter all ICAO codes for airports in your vACC/ARTCC. This is used for departure and arrival commands to display correct data,
-* callsign_prefix - enter all airport and CTR codes under your vACC/ARTCC. You can simply copy content from airports.json and add CTR & FSS stations,
-* Under cogs folder you will have to modify 4 files allArrivals.py, arrivals.py, allDepartures.py and departures.py with airport coordinates in order to perform correct ETA calculations. For METAR command to work you will need to edit metar.py and insert your checkwx API key. CheckWX is free up to 2000 requests per day so it will be more then enough for your server. If you desire to use any other METAR provider you will have to rework entire metar.py as it is built for CheckWX API. 
-* Under bot_config->secrets you will have to enter you Discord Bot token found under Discord Developer portal
+As this is bot that you will need to host on your own you don't need to have extensive Python knowledge to make it work as it should. We implemented config files which can be used for most parts of bot edit but you will also have to edit 4 python files with correct data so bot can perform calculations of ETA. You can use Visual Studio Code or Notepad ++ (or any code editor you like) to edit this files just make sure to follow examples left in files.
 
+So let's see what we need to edit:
+*Under bot_config you have 2 files to edit: secrets.json and config.json. First let's start with secrets.json where you need to enter your bot token from Discord Developer Portal. Once you done that let's move to config.json file. Here you will need to enter channel ID's (you can get them by right clicking on text channel and selecting Copy ID). This ID's are used in code for annoucements and broadcasts so make sure to select correct channels for bot to send messages to. 
+*airports.json - enter all ICAO codes for airports in your vACC/ARTCC. This is used for departure and arrival commands to display correct data,
+*callsign_prefix - enter all airport and CTR codes under your vACC/ARTCC. You can simply copy content from airports.json and add CTR & FSS stations,
+*To make sure bot can make ETA calculations you will have to edit 4 files which looks for coordinates of the airports. Navigate to cogs folder and find allArrivals.py, arrivals.py, allDepartures.py and departures.py (you can combine departures and arrivals by simply copy/paste code from one file to another without imports and class) and find airport coordinates located in code. You will have to enter all airport coordinates in order to bot to correctly calculate ETA times and determine status of the flight. 
+ 
 
 ## Example
-If you want to take a look at how does this bot works on server you can join VATAdria server at: https://discord.gg/nsBQcdY. Keep in mind you will have to link your VATSIM & Discord Accounts in order to access the server. If you have any further questions you can send me a message (Marko Tomicic - 1359931 on Discord server) and I will gladly assist with any questions.
+You want to find out how does this bot work on day-to-day basis? Fear not simply hop into our Discord server at: https://discord.gg/nsBQcdY link your VATSIM & Discord Accounts and you will be able to use this bot made for VATSIM Adria to explore all functions of the bot. Also, you can get support by developer (find him under as Marko Tomicic - 1359931 on our Discord).
 
 
 ## How to host the bot?
-While with v1 you could use heroku to host it, with this version you will not be albe to do so and I suggest using DigitalOcean which will cost you around 5$ per month to keep the bot up and running 24/7. If you need help there are documentation on DO site or you can again contact me via Discord and I will be happy to help. 
+In order to host this bot you have 2 options (let's assume you want it to run 24/7):
+1.) Host it on VPS such as DO,
+2.) Host it on some old laptop, Raspbery Pi, etc
 
-
-# HOSTING
-This bot is hosted on Linux server which runs 24/7/365 to ensure 100% up time of the bot. If there is any changes to the bot you can simply reload the cogs and all commands and events
-will be updated without bot restart. More work needs to be done here so we can send a message to special Admin channel when bot restarts and loads cogs to make sure that it is up and 
-running. Some code optimisation will happen over time as we get more time on our hands so we can have this bot so powerfull and simple to use for all members accross VATSIM.
+While both of this options will work just fine I would recommend getting VPS from DO (Droplet) which will cost you around 5$ a month for basic Ubuntu based server. Also there is docummentation available on their site on how to host it and you don't need to worry about up time, shortages or anything as it is hosted outside of your home. Also make sure to install all required frameworks (Discord & Buttons) in order for code to work. They can be found in requirements.txt so you can simply run pip install -r requirements.txt and it will download and install all needed frameworks
