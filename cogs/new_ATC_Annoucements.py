@@ -1,3 +1,4 @@
+import discord
 from discord import Embed
 from discord.ext.commands import Cog
 from discord.ext import tasks
@@ -38,7 +39,6 @@ class atcAnnoucements(Cog):
     @tasks.loop(minutes=5)
     async def atcAnnoucements(self):
         try:
-            channel = self.bot.get_channel(atc_channel_id)
             online_2_cs = []
             online_2_obj = []
             r = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
@@ -73,6 +73,7 @@ class atcAnnoucements(Cog):
                         onlineEmbed.add_field(name=":man: Controller", value=f"`{i.get_controller_name()}`", inline=False)
                         onlineEmbed.add_field(name=":radio: Frequency", value=f"`{i.get_frequency()}`", inline=False)
                         onlineEmbed.set_footer(text=f"Logged on at: {time_logg}z")
+                        channel = self.bot.get_channel(int(atc_channel_id))
                         await channel.send(embed=onlineEmbed)
 
             #Controller Offline
@@ -84,6 +85,7 @@ class atcAnnoucements(Cog):
                     await channel.send(embed=offlineEmbed)
         except:
             pass
+
     @Cog.listener()
     async def on_ready(self):
         print(f"{self.__class__.__name__} cog has been loaded\n-----")
