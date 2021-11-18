@@ -42,7 +42,7 @@ class atcBookings(Cog):
     @tasks.loop(minutes=1)
     async def newBooking(self):
         try:
-            channel = self.bot.get_channel(bookings_channel_id)
+            
             booked_2_cs = []
             booked_2_obj = []
             tree = ET.fromstring(requests.get('http://vatbook.euroutepro.com/xml2.php?fir=').text)
@@ -76,14 +76,16 @@ class atcBookings(Cog):
                     bokembed.set_footer(
                         text =f"Booked by: {i.get_booked()}"
                         )
+                    channel = self.bot.get_channel(int(bookings_channel_id))
                     await channel.send(embed=bokembed)
 
             #Check if booking is removed!
             for i in booked_cs:
                 if i not in booked_2_cs:
                     booked_cs.remove(i)
-                    bookremove = discord.Embed(name="VATAdria Booking Annoucement", description=f"ATC Booking was removed!", color=0xff9500)
+                    bookremove = discord.Embed(title="VATAdria Booking Annoucement", description=f"ATC Booking was removed!", color=0xff9500)
                     bookremove.add_field(name=":id: Callsign", value=f"{i}", inline=True)
+                    channel = self.bot.get_channel(int(bookings_channel_id))
                     await channel.send(embed=bookremove)
         except:
             pass

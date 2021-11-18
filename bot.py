@@ -18,6 +18,8 @@ from utils.util import clean_code, Pag
 cwd = Path(__file__).parents[0]
 cwd = str(cwd)
 print(f"{cwd}\n----")
+COGS = [path.split("/")[-1][:-3] for path in glob(".cogs/*.py")]
+
 
 intents = discord.Intents.all()
 DEFAULTPREFIX = "!"
@@ -48,8 +50,6 @@ bot = commands.Bot(
 )
 
 bot.config_token = secret_file["token"]
-
-logging.basicConfig(level=logging.INFO)
 
 bot.DEFAULTPREFIX = DEFAULTPREFIX
 bot.cwd = cwd
@@ -90,6 +90,13 @@ async def on_ready():
     await bot.change_presence(
         activity=discord.Game(name="Watching !help")
     )
+    for cog in COGS:
+        try:
+            bot.unload_extension(f'cogs.{cog}')
+            bot.load_extension(f'cogs.{cog}')
+
+        except Exception as e:
+            print('{}: {}'.format(type(e).__name__, e))
 
 @bot.event
 async def on_message(message):
