@@ -8,8 +8,10 @@ import requests
 import json
 import math
 
+with open("airports.json") as json_file:
+    airport = json.load(json_file)
 
-airport = json.loads(open("airports.json").read())
+url = "https://www.airport-data.com/api/ap_info.json?icao="
 
 class allArrivals(Cog):
     def __init__(self, bot):
@@ -28,82 +30,12 @@ class allArrivals(Cog):
                         arrivals_exist = True
                         lan = 0.0
                         long = 0.0
-                        # Positions of the airports (LAT and LONG)
-                        if item['flight_plan']['arrival'] == "LDDU":
-                            lan = 42.561389
-                            long = 18.268333
-                        elif item['flight_plan']['arrival'] == "LYBE":
-                            lan = 44.819444
-                            long = 20.306944
-                        elif item['flight_plan']['arrival'] == "LDZA":
-                            lan = 45.743056
-                            long = 16.068889
-                        elif item['flight_plan']['arrival'] == "LDZD":
-                            lan = 44.108333
-                            long = 15.346667
-                        elif item['flight_plan']['arrival'] == "LDPL":
-                            lan = 44.893611
-                            long = 13.922222
-                        elif item['flight_plan']['arrival'] == "LDSP":
-                            lan = 43.538889
-                            long = 16.298056
-                        elif item['flight_plan']['arrival'] == "LDOS":
-                            lan = 45.462778
-                            long = 18.810278
-                        elif item['flight_plan']['arrival'] == "LDRI":
-                            lan = 45.216944
-                            long = 14.570278
-                        elif item['flight_plan']['arrival'] == "LJLJ":
-                            lan = 46.224444
-                            long = 14.456111
-                        elif item['flight_plan']['arrival'] == "LJMB":
-                            lan = 46.479722
-                            long = 15.686111
-                        elif item['flight_plan']['arrival'] == "LJPZ":
-                            lan = 45.473353
-                            long = 13.614978
-                        elif item['flight_plan']['arrival'] == "LYPG":
-                            lan = 42.359444
-                            long = 19.251944
-                        elif item['flight_plan']['arrival'] == "LYVR":
-                            lan = 45.147778
-                            long = 21.309722
-                        elif item['flight_plan']['arrival'] == "LYTV":
-                            lan = 42.404722
-                            long = 18.723333
-                        elif item['flight_plan']['arrival'] == "LYNI":
-                            lan = 43.337222
-                            long = 21.853611
-                        elif item['flight_plan']['arrival'] == "LYKV":
-                            lan = 43.818611
-                            long = 20.585278
-                        elif item['flight_plan']['arrival'] == "LYUZ":
-                            lan = 43.898886
-                            long = 19.697683
-                        elif item['flight_plan']['arrival'] == "LWSK":
-                            lan = 41.961111
-                            long = 21.626944
-                        elif item['flight_plan']['arrival'] == "LWOH":
-                            lan = 41.18
-                            long = 20.742222
-                        elif item['flight_plan']['arrival'] == "LATI":
-                            lan = 41.414722
-                            long = 19.720556
-                        elif item['flight_plan']['arrival'] == "LQSA":
-                            lan = 43.824722
-                            long = 18.331389
-                        elif item['flight_plan']['arrival'] == "LQMO":
-                            lan = 43.282778
-                            long = 17.845833
-                        elif item['flight_plan']['arrival'] == "LQBK":
-                            lan = 44.936111
-                            long = 17.299167
-                        elif item['flight_plan']['arrival'] == "LQTZ":
-                            lan = 44.458611
-                            long = 18.724722
-                        elif item['flight_plan']['arrival'] == "BKPR":
-                            lan = 42.572778
-                            long = 21.035833
+                        airport_data_url = f"{url}{item['flight_plan']['arrival']}"
+                        api_data = requests.get(airport_data_url).json()
+                        data = json.dumps(api_data)
+                        api = json.loads(data)
+                        lan = float(api['latitude'])
+                        long = float(api['longitude'])
 
                             # calculations
                         utc = datetime.now(timezone.utc)
