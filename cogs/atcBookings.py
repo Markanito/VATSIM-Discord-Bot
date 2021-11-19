@@ -69,7 +69,7 @@ class atcBookings(Cog):
             for i in booked_2_obj:
                 if i.get_callsign() not in booked_cs:
                     booked_cs.append(i.get_callsign())
-                    bokembed = discord.Embed(title="VATAdria Booking Annoucement", description="New booking found for today!", colour = discord.Colour.dark_red())
+                    bokembed = discord.Embed(title="VATAdria Booking Annoucement", description="`New booking found for today!`", colour = discord.Colour.dark_red())
                     bokembed.add_field(name=':radio: Position', value=f"`{i.get_callsign()}`", inline=False)
                     bokembed.add_field(name=":timer: Start Time", value=f"`{i.get_bookings_start()}z`", inline=False)
                     bokembed.add_field(name=':timer: End Time', value=f"`{i.get_bookings_end()}z`", inline=False)
@@ -83,7 +83,7 @@ class atcBookings(Cog):
             for i in booked_cs:
                 if i not in booked_2_cs:
                     booked_cs.remove(i)
-                    bookremove = discord.Embed(title="VATAdria Booking Annoucement", description=f"ATC Booking was removed!", color=0xff9500)
+                    bookremove = discord.Embed(title="VATAdria Booking Annoucement", description=f"`:x:ATC Booking was removed! :x:`", color=0xff9500)
                     bookremove.add_field(name=":id: Callsign", value=f"{i}", inline=True)
                     channel = self.bot.get_channel(int(bookings_channel_id))
                     await channel.send(embed=bookremove)

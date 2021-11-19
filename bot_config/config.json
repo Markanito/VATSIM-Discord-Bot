@@ -1,8 +1,11 @@
 {
-    "atc_channel": "806457781032714280", 
-    "bookings_channel": "806457814750724096",
-    "events_channel": "805034956966592593",
-    "news_channel": "806458731104698388",
-    "sector_file_channel": "652146473345220626",
-    "checkwx_api_key": "Your CheckWX API Key goes here"
+    "atc_channel": "781834455765483562",
+    "bookings_channel": "781834455765483562",
+    "events_channel": "692681048798265347",
+    "news_channel": "781834455765483562",
+    "sector_file_channel": "781834455765483562",
+    "checkwx_api_key": "0b955dec24ccb45ede04524bec",
+    "staff_role_name": "Staff",
+    "discord_admin_role_name": "Admin",
+    "moderator_role_name": "Moderator"
 }
