@@ -14,6 +14,9 @@ bot_config_file = utils.json_loader.read_json("config")
 events_channel_id = bot_config_file["events_channel"]
 news_channel_id = bot_config_file["news_channel"]
 sector_file_channel_id = bot_config_file["sector_file_channel"]
+staff_role = bot_config_file['staff_role_name']
+admin_role = bot_config_file['discord_admin_role_name']
+moderator_role = bot_config_file['moderator_role_name']
 
 class broadcast(Cog):
     def __init__(self, bot):
@@ -21,7 +24,7 @@ class broadcast(Cog):
 
 #Events Broadcast
     @command(name="evbroadcast", brief="Broadcast event message in events channgel. Only usable by Staff!")
-    @has_any_role("Staff", "Moderator", "Discord Admin")
+    @has_any_role(str(staff_role), str(admin_role), str(moderator_role))
     @cooldown(1, 300, BucketType.user)
     async def evbroadcast(self, ctx):
         def check(message):
@@ -48,7 +51,7 @@ class broadcast(Cog):
 
     #Sector File Broadcast
     @command(name="secbroadcast", brief="Broadcast message for sector file update. Only usable by Staff!")
-    @has_any_role("Staff", "Moderator", "Discord Admin")
+    @has_any_role(str(staff_role), str(admin_role), str(moderator_role))
     @cooldown(1, 300, BucketType.user)
     async def secbroadcast(self, ctx):
         def check(message):
@@ -69,7 +72,7 @@ class broadcast(Cog):
 
     #General Broadcast
     @command(name="genbroadcast", brief="Broadcast event message in events channgel. Only usable by Staff!")
-    @has_any_role("Staff", "Moderator", "Discord Admin")
+    @has_any_role(str(staff_role), str(admin_role), str(moderator_role))
     @cooldown(1, 300, BucketType.user)
     async def genbroadcast(self, ctx, *, message: str):
         if len(message) == 0:
@@ -81,7 +84,7 @@ class broadcast(Cog):
             await ctx.send(f"News broadcast sent, I deleted all messages to keep the channel clean. *This message will be deleted in 10 seconds!*", delete_after=10)
     
     @command(name="push", brief="Push message for events. Only usable by Staff!")
-    @has_any_role("Staff", "Moderator", "Discord Admin")
+    @has_any_role(str(staff_role), str(admin_role), str(moderator_role))
     @cooldown(1, 300, BucketType.user)
     async def push(self, ctx, *, message: str):
         if len(message) == 0:

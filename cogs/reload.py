@@ -4,25 +4,31 @@ from discord.colour import Color
 from discord.ext.commands import command, Cog
 from discord.ext.commands.core import has_role
 from glob import glob
+import utils.json_loader
 
+#Where COGS files are saved 
 COGS = [path.split("\\")[-1][:-3] for path in glob("./cogs/*.py")]
 
+
+#Roles allowed to use this commands, for now only discord admins can do this!
+bot_config_file = utils.json_loader.read_json("config")
+admin_role = bot_config_file["discord_admin_role_name"]
 class Reload(Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @command(name="load", brief="Load a new command")
-    @has_role("Discord Admin")
+    @has_role(str(admin_role))
     async def load(self, ctx, *, cog: str):
         try:
-            self.bot.load_extension(f'cogs.{cog}')
+            self.bot.load_extension(f'.{cog}')
             loadEmbed = discord.Embed(title=f":thumbsup: Loaded {cog} successfully! :thumbsup:", color = discord.Colour.green())
             await ctx.send(embed=loadEmbed, delete_after=5)
         except Exception as e:
             await ctx.send('{}: {}'.format(type(e).__name__, e))
 
     @command(name="unload", brief="Unload a command")
-    @has_role("Discord Admin")
+    @has_role(str(admin_role))
     async def unload(self, ctx, *, cog: str):
         try:
             self.bot.unload_extension(f'.{cog}')
@@ -33,7 +39,7 @@ class Reload(Cog):
             await ctx.send('{}: {}'.format(type(e).__name__, e))
 
     @command(name="reload", brief="Reload all commands")
-    @has_role("Discord Admin",)
+    @has_role(str(admin_role))
     async def reload(self, ctx):
         for cog in COGS:
             try:
