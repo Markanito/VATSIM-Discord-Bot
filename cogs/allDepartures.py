@@ -15,7 +15,7 @@ class allDepartures(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @command(name="alldepartures", brief="Display departures into all VATAdria Region!")
+    @command(name="alldepartures", brief="Display departures from Adria Region!")
     @cooldown(2, 60, BucketType.user)
     async def alldepartures(self, ctx,):
         t = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()

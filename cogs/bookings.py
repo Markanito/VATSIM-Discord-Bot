@@ -6,7 +6,7 @@ from discord.ext.commands.core import command, Cog, cooldown
 import requests
 from datetime import datetime, timezone, date, time
 
-atc = json.loads(open("atc_positions.json").read())
+#atc = json.loads(open("atc_positions.json").read())
 with open("callsign_prefix.json") as json_file:
     callsign_prefix = json.load(json_file)
 positions = ["GND","TWR","APP","CTR"]

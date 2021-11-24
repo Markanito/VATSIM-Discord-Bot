@@ -23,23 +23,23 @@ class broadcast(Cog):
         self.bot = bot
 
 #Events Broadcast
-    @command(name="evbroadcast", brief="Broadcast event message in events channgel. Only usable by Staff!")
+    @command(name="evbroadcast", brief="Event Broadcast message, only usable by Staff!")
     @has_any_role(str(staff_role), str(admin_role), str(moderator_role))
     @cooldown(1, 300, BucketType.user)
     async def evbroadcast(self, ctx):
         def check(message):
             return message.author == ctx.author and message.channel == ctx.channel
         with ctx.channel.typing():
-            await ctx.send('What is events title?')
+            await ctx.send('What is event title?')
             title = await self.bot.wait_for('message', check=check)
 
-            await ctx.send('What is events info? You can use formating to highlight important info.')
+            await ctx.send('What is description? You can use formating to highlight important info.')
             desc = await self.bot.wait_for('message', check=check)
 
-            await ctx.send('What is event website? If possible use official VATSIM URL or link to our website.')
+            await ctx.send('What is event website? If possible, use official (my)VATSIM URL or link to our website.')
             url = await self.bot.wait_for('message', check=check)
 
-            await ctx.send('And now give me link to events picture.')
+            await ctx.send('What is the link to the event picture?')
             picture = await self.bot.wait_for('message', check=check)
 
             channel = self.bot.get_channel(int(events_channel_id))
@@ -47,24 +47,24 @@ class broadcast(Cog):
             evembed.set_image(url=picture.content)
             await channel.send(embed=evembed)
             deleted = await ctx.channel.purge(limit=9)
-            await ctx.send(f"Events broadcast sent, I deleted all messages to keep the channel clean.", delete_after=10)
+            await ctx.send(f"Event broadcast sent, service messages deleted to keep the channel clean.", delete_after=10)
 
     #Sector File Broadcast
-    @command(name="secbroadcast", brief="Broadcast message for sector file update. Only usable by Staff!")
+    @command(name="secbroadcast", brief="Sector file update broadcast message, only usable by Staff!")
     @has_any_role(str(staff_role), str(admin_role), str(moderator_role))
     @cooldown(1, 300, BucketType.user)
     async def secbroadcast(self, ctx):
         def check(message):
             return message.author == ctx.author and message.channel == ctx.channel
         with ctx.channel.typing():
-            await ctx.send('Input sector file AIRAC.')
+            await ctx.send('Input sector file AIRAC number.')
             airac = await self.bot.wait_for('message', check=check)
         
-            await ctx.send('What is new in this sector file?')
+            await ctx.send('What is new in this sector file? (paste changelog)')
             updates = await self.bot.wait_for('message', check=check)
 
             channel = self.bot.get_channel(int(sector_file_channel_id))
-            secembed = Embed(title=f'New sector file (Airac {airac.content}) is up and running', url="http://files.aero-nav.com/ADRIA", description =updates.content, color=0x0400ff)
+            secembed = Embed(title=f'New sector file (Airac {airac.content}) has been released!', url="http://files.aero-nav.com/ADRIA", description =updates.content, color=0x0400ff)
             secembed.set_footer(text="Update guide at https://www.forum.vatadria.net/showthread.php?tid=487%22")
             await channel.send(embed=secembed)
             deleted = await ctx.channel.purge(limit=5)

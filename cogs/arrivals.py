@@ -70,40 +70,56 @@ class arrivals(Cog):
                             destairport = item['flight_plan']['arrival']
                             route = item['flight_plan']['route']
 
-                            #Time Converter, please don't fuck with this
-                            if int(item['flight_plan']['cruise_tas']) > 0:
-                                
-                                time = distance / int(item['flight_plan']['cruise_tas'])
-                                hour = int(time)
-                                arrival_hour = utc.hour + hour
-                                arrival_minute = utc.minute + int((time - int(time))*60)
-                                if arrival_minute <10:
-                                    arrival_time = f"{arrival_hour}:0{arrival_minute}z"
 
-                                elif 10 < arrival_minute < 59:
-                                    arrival_time = f"{arrival_hour}:{arrival_minute}z"
-
-                                elif arrival_minute > 59:
-                                    add_hour = int(arrival_minute / 60)
-                                    arrival_minute = int(((arrival_minute / 60) - add_hour) * 60)
-                                    arrival_hour = arrival_hour + add_hour
-                                    
-                                    if arrival_hour > 23:
-                                        days = int(arrival_hour / 24)
-                                        arrival_hour = (arrival_hour - (days * 24))
-                                        if days == 1:
-                                            if arrival_minute < 10:
-                                                arrival_time = f"{arrival_hour}:0{arrival_minute}z tomorrow"
-                                            else:
-                                                arrival_time = f"{arrival_hour}:{arrival_minute}z tomorrow"
+                            #Status converter
+                            if int(item['groundspeed']) < 50:
+                                if distance < 10:
+                                    status = f"Arrived at destination"
+                                    color = Colour.green()
                                 else:
-                                    arrival_time= f"{arrival_hour}:{arrival_minute}z"                            
+                                    status = f"Preparing for the flight"
+                                    color = Colour.dark_orange()
                             else:
-                                arrival_time = f"Plane is on the ground."
+                                status = f"On the way"
+                                color = Colour.blue()
+
+                            #Time Converter, please don't fuck with this
+                            try:
+                                if int(item['groundspeed']) > 50:
+                                    
+                                    time = distance / int(item['groundspeed'])
+                                    hour = int(time)
+                                    arrival_hour = utc.hour + hour
+                                    arrival_minute = utc.minute + int((time - int(time))*60)
+                                    if arrival_minute <10:
+                                        arrival_time = f"{arrival_hour}:0{arrival_minute}z"
+
+                                    elif 10 < arrival_minute < 59:
+                                        arrival_time = f"{arrival_hour}:{arrival_minute}z"
+
+                                    elif arrival_minute > 59:
+                                        add_hour = int(arrival_minute / 60)
+                                        arrival_minute = int(((arrival_minute / 60) - add_hour) * 60)
+                                        arrival_hour = arrival_hour + add_hour
+                                            
+                                        if arrival_hour > 23:
+                                            days = int(arrival_hour / 24)
+                                            arrival_hour = (arrival_hour - (days * 24))
+                                            if days == 1:
+                                                if arrival_minute < 10:
+                                                    arrival_time = f"{arrival_hour}:0{arrival_minute}z tomorrow"
+                                                else:
+                                                    arrival_time = f"{arrival_hour}:{arrival_minute}z tomorrow"
+                                    else:
+                                        arrival_time= f"{arrival_hour}:{arrival_minute}z"
+                                else:
+                                    arrival_time = f"Plane is on the ground."
+                            except:
+                                arrival_time = f"Plane is on the ground"
 
                             
                             #Status converter
-                            if int(item['flight_plan']['cruise_tas']) < 70:
+                            if int(item['groundspeed']) < 70:
                                 if distance < 10:
                                     status = f"Arrived at destination"
                                     color = Colour.green()
