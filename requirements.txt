@@ -1,0 +1,12 @@
+git+https://github.com/Rapptz/discord.py
+requests
+buttons
+utils
+utils.json_loader
+io
+os
+logging
+textwrap
+contextlib
+discord
+json

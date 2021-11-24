@@ -80,7 +80,7 @@ class atcAnnoucements(Cog):
             for i in online_cs:
                 if i not in online_2_cs:
                     online_cs.remove(i)
-                    offlineEmbed = Embed(title="ATC Announcement", description=f"`:x: ATC Logged off! Hope to see you soon :x:`", color=0xff9500)
+                    offlineEmbed = Embed(title="ATC Announcement", description=f":x: `ATC Logged off! Hope to see you soon` :x:", color=0xff9500)
                     offlineEmbed.add_field(name=":id: Callsign", value=f"{i}", inline=True)
                     channel = self.bot.get_channel(int(atc_channel_id))
                     await channel.send(embed=offlineEmbed)

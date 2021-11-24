@@ -83,7 +83,7 @@ class atcBookings(Cog):
             for i in booked_cs:
                 if i not in booked_2_cs:
                     booked_cs.remove(i)
-                    bookremove = discord.Embed(title="VATAdria Booking Annoucement", description=f"`:x:ATC Booking was removed! :x:`", color=0xff9500)
+                    bookremove = discord.Embed(title="VATAdria Booking Annoucement", description=f":x:`ATC Booking was removed!` :x:", color=0xff9500)
                     bookremove.add_field(name=":id: Callsign", value=f"{i}", inline=True)
                     channel = self.bot.get_channel(int(bookings_channel_id))
                     await channel.send(embed=bookremove)
