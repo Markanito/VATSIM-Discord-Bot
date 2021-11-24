@@ -57,7 +57,7 @@ This bot was built with:
 
 * [Python](https://www.python.org/)
 * [Discord.py](https://github.com/Rapptz/discord.py)
-
+* [Pytaf](https://github.com/dmbaturin/pytaf)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -75,7 +75,15 @@ This bot was built to be used by VATSIM vACC/ARTCC but I can't provide 1 bot you
 
 ### Installation
 
-_In order to make this bot work you follow instructions step by step!!
+_In order to make this bot work you follow instructions step by step!!_
+* Imporant notice: If you are hosting this bot on Windows server open `cogs/reload.py` and replace:
+     ```py
+    COGS = [path.split("/")[-1][:-3] for path in glob("./cogs/*.py")]
+   ```
+   with
+    ```py
+    COGS = [path.split("\")[-1][:-3] for path in glob("./cogs/*.py")]
+   ```
 
 1. Create your bot on [Discord Developer POrtal](https://discord.com/developers/applications)
 2. Get a free [CheckWX API Key](https://www.checkwxapi.com/)
