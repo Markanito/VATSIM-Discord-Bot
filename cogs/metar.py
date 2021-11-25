@@ -21,7 +21,7 @@ class metar(Cog):
     @command(name="metar", description="Get decoded METAR for <ICAO> airport")
     async def metar(self, ctx, *, ICAO: str):
 
-        final_url = f"{url}{ICAO}{rule}"
+        final_url = f"{url}{ICAO.upper()}{rule}"
         req = requests.get(final_url, headers=hdr).json()
         x = json.dumps(req)
         s = json.loads(x)

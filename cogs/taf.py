@@ -18,7 +18,7 @@ class taf(Cog):
 
     @command(name="taf", description="Get decoded taf for airport")
     async def taf(self, ctx, *, ICAO: str):
-        final_url = f"{url}{ICAO}{rule}"
+        final_url = f"{url}{ICAO.upper()}{rule}"
         req = requests.get(final_url, headers=hdr).json()
         x = json.dumps(req)
         s = json.loads(x)
