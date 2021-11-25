@@ -20,25 +20,17 @@ class Reload(Cog):
     @command(name="load", brief="Load a new command")
     @has_role(str(admin_role))
     async def load(self, ctx, *, cog: str):
-        try:
-            for cogs in COGS:
-                self.bot.load_extension(f'cogs.{cog}')
-                loadEmbed = discord.Embed(title=f":thumbsup: Loaded {cog} successfully! :thumbsup:", color = discord.Colour.green())
-                await ctx.send(embed=loadEmbed, delete_after=5)
-        except Exception as e:
-            await ctx.send('{}: {}'.format(type(e).__name__, e))
+            self.bot.load_extension(f'cogs.{cog}')
+            loadEmbed = discord.Embed(title=f":thumbsup: Loaded {cog} successfully! :thumbsup:", color = discord.Colour.green())
+            await ctx.send(embed=loadEmbed, delete_after=5)
 
     @command(name="unload", brief="Unload a command")
     @has_role(str(admin_role))
     async def unload(self, ctx, *, cog: str):
-        try:
-            for cogs in COGS:
-                self.bot.unload_extension(f'cogs.{cog}')
+            self.bot.unload_extension(f'cogs.{cog}')
                 
-                unloadEmbed = discord.Embed(title=f":thumbsup: Unloaded {cog} successfully! :thumbsup:", color = discord.Colour.red())
-                await ctx.send(embed=unloadEmbed, delete_after=5)
-        except Exception as e:
-            await ctx.send('{}: {}'.format(type(e).__name__, e))
+            unloadEmbed = discord.Embed(title=f":thumbsup: Unloaded {cog} successfully! :thumbsup:", color = discord.Colour.red())
+            await ctx.send(embed=unloadEmbed, delete_after=5)
 
     @command(name="reload", brief="Reload all commands")
     @has_role(str(admin_role))
