@@ -19,16 +19,16 @@ class arrivals(Cog):
     @command(name="arrivals", brief="Display arrivals into <ICAO> airport! <ICAO> is required!")
     @cooldown(2, 60, BucketType.user)
     async def arrivals(self, ctx, *, ICAO: str):
-        if len(ICAO) == 0:
+        if len(ICAO.upper()) == 0:
             await ctx.replay("Please provide ICAO code for an airport!")
 
-        if len(ICAO) > 4:
+        if len(ICAO.upper()) > 4:
             await ctx.replay("ICAO provided is not valid. Check ICAO code and try agin!")
 
-        if len(ICAO) < 4:
+        if len(ICAO.upper()) < 4:
             await ctx.replay("ICAO provided is not valid. Check ICAO code and try agin!")
 
-        if ICAO in airport:
+        if ICAO.upper() in airport:
             t = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
             xy = json.dumps(t)
             s = json.loads(xy)
@@ -40,7 +40,7 @@ class arrivals(Cog):
                             arrivals_exist = True
                             lan = 0.0
                             long = 0.0
-                            airport_data_url = f"{url}{ICAO}"
+                            airport_data_url = f"{url}{ICAO.upper()}"
                             api_data = requests.get(airport_data_url).json()
                             data = json.dumps(api_data)
                             api = json.loads(data)

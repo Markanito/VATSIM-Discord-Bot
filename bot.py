@@ -44,7 +44,7 @@ secret_file = utils.json_loader.read_json("secrets")
 bot = commands.Bot(
     command_prefix=get_prefix,
     case_insensitive=True,
-    owner_id=331516683258822658,
+    owner_id=int(secret_file['owner_id']),
     help_command=None,
     intents=intents
 )

@@ -76,16 +76,17 @@ This bot was built to be used by VATSIM vACC/ARTCC but I can't provide 1 bot you
 ### Installation
 
 _In order to make this bot work you follow instructions step by step!!_
-* Imporant notice: If you are hosting this bot on Windows server open `cogs/reload.py` and replace:
-     ```py
-    COGS = [path.split("/")[-1][:-3] for path in glob("./cogs/*.py")]
+_Important notice! In `cogs/reload.py` replace line 10 with proper code based on where you host your bot!_
+   ```py
+    COGS = [path.split("/")[-1][:-3] for path in glob("./cogs/*.py")] #Linux based systems
    ```
    with
-    ```py
-    COGS = [path.split("\")[-1][:-3] for path in glob("./cogs/*.py")]
+
+   ```py
+    COGS = [path.split("\\")[-1][:-3] for path in glob("./cogs/*.py")] #Windows based systems
    ```
 
-1. Create your bot on [Discord Developer POrtal](https://discord.com/developers/applications)
+1. Create your bot on [Discord Developer POrtal](https://discord.com/developers/applications), once you created your bot navigate to Bot tab and make sure all Intents are turned on! Now you can invite it to your server and give it admin privilages!
 2. Get a free [CheckWX API Key](https://www.checkwxapi.com/)
 3. Clone the repo
    ```sh
@@ -93,7 +94,11 @@ _In order to make this bot work you follow instructions step by step!!_
    ```
 4. Install required packages (Make sure you have Python and Pip installed beofre installing packages!)
    ```sh
-   pip install -r requirements.txt
+    pip install -r requirements.txt
+   ```
+   Or if you are on Linux based system
+      ```sh
+    sudo pip install -r requirements.txt
    ```
 5. Enter your bot token in  `bot_config/secrets.json`
    ```py
@@ -125,7 +130,7 @@ _In order to make this bot work you follow instructions step by step!!_
         "LYBA",
     }
    ```
-9. Run your bot by runing `python3.10 bot.py` and invite it to your server!
+9. Run your bot by runing `python3.10 bot.py`
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

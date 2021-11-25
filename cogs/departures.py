@@ -18,20 +18,19 @@ class departures(Cog):
     @command(name="departures", brief="Display all departures from <ICAO> airport! <ICAO> is requried!")
     @cooldown(2, 60, BucketType.user)
     async def departures(self, ctx, *, ICAO: str):
-        if len(ICAO) == 0:
+        if len(ICAO.upper()) == 0:
             await ctx.replay("Please provide ICAO code for an airport!")
 
-        if len(ICAO) > 4:
+        if len(ICAO.upper()) > 4:
             await ctx.replay("ICAO provided is not valid. Check ICAO code and try agin!")
 
-        if len(ICAO) < 4:
+        if len(ICAO.upper()) < 4:
             await ctx.replay("ICAO provided is not valid. Check ICAO code and try agin!")
 
-        if ICAO in airport:
+        if ICAO.upper() in airport:
             t = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
             xy = json.dumps(t)
             s = json.loads(xy)
-            channel = self.bot.get_channel(686512894065770586)
             departures_exist = False
             for item in s['pilots']:
                 if item['flight_plan'] != None:
@@ -44,9 +43,9 @@ class departures(Cog):
                         depe.add_field(name=":airplane_arriving: Destination Airport", value=f"`{item['flight_plan']['arrival']}`", inline=True)
                         depe.add_field(name=":timer: Planned Dep Time", value=f"`{item['flight_plan']['deptime']}z`", inline=True)
                         depe.add_field(name=":airplane: Route", value=f"`{item['flight_plan']['route']}`", inline=True)
-                        await channel.send(embed=depe)
+                        await ctx.send(embed=depe)
             if not departures_exist:
-                await channel.send(f"**There is no departures from {ICAO} at the moment!**")
+                await ctx.send(f"**There is no departures from {ICAO} at the moment!**")
     @Cog.listener()
     async def on_ready(self):
         print(f"{self.__class__.__name__} cog has been loaded\n-----")
