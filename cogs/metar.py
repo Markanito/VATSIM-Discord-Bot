@@ -35,8 +35,12 @@ class metar(Cog):
             flight_category = item['flight_category']
             visibility = f"{item['visibility']['meters']} meters"
             temp = item['temperature']['celsius']
+            temp_f = item['temperature']['fahrenheit']
             dewpoint = item['dewpoint']['celsius']
-            altim = item['barometer']['hpa']
+            dewpoint_f = item['dewpoint']['fahrenheit']
+            altimq = item['barometer']['hpa']
+            altima = item['barometer']['hg']
+            humidity = item['humidity']['percent']
             
             #Do not change values below if you don't know what they do. It is importnat to keep them as is for METAR decoding function to work properly!
             #Flight Category Color
@@ -78,33 +82,34 @@ class metar(Cog):
                 elif item['clouds'][0]['code'] == 'CLR':
                     clouds = f'Clear Skies'
                 else:
-                    clouds = ''.join(f"{data['text']} at {data['feet']} feet, " for data in item['clouds'])
+                    clouds = ''.join(f"{data['text']} at {data['feet']} feet\n" for data in item['clouds'])
             except:
                 clouds = f'Clear Skies'
 
             ##Condition Builder
             try:
                 if item['conditions'] is not None:
-                    condition = ''.join(f"{data['text']}, " for data in item['conditions'])
+                    condition = ''.join(f"{data['text']}\n" for data in item['conditions'])
             except:
                 condition = f'No conditions observed'
 
             #Ceiling Builder
             try:
                 if item['ceiling'] is not None:
-                    ceiling = ''.join(f"{item['ceiling']['text']} at {item['ceiling']['feet']},")
+                    ceiling = ''.join(f"{item['ceiling']['text']} at {item['ceiling']['feet']}\n")
             except:
                 ceiling = f'No ceiling observed'
 
             metembed = Embed(title=f"Decoded METAR for {station_id}", description=f"RAW METAR: `{raw_text}`\n\n **__METAR valid {metar_time}z\n\n__**\n_Flight Category = {flight_category}_", colour=color)
-            metembed.add_field(name=":wind_chime: Winds", value=f"`{winds}`", inline=False)
-            metembed.add_field(name=":eyes: Visibility", value=f"`{visibility}`", inline=False)
-            metembed.add_field(name=":cloud: Clouds", value=f"`{clouds}`", inline=False)
-            metembed.add_field(name=":cloud_rain: Weather", value=f"`{condition}`", inline=False)
-            metembed.add_field(name="::white_sun_small_cloud: Ceiling", value=f"`{ceiling}`", inline=False)
-            metembed.add_field(name=":thermometer: Temperature", value=f"`{temp}°C`", inline=False)
-            metembed.add_field(name=":regional_indicator_d: Dewpoint", value=f"`{dewpoint}°C`", inline=False)
-            metembed.add_field(name=":regional_indicator_q: Barometer", value=f"`{altim}`", inline=False)
+            metembed.add_field(name=":wind_blowing_face:  Wind", value=f"`{winds}`", inline=True)
+            metembed.add_field(name=":fog: Visibility", value=f"`{visibility}`", inline=True)
+            metembed.add_field(name=":umbrella: Humidity", value=f"`{humidity}%`", inline=True)
+            metembed.add_field(name=":cloud: Clouds", value=f"`{clouds}`", inline=True)
+            metembed.add_field(name=":cloud_rain: Weather", value=f"`{condition}`", inline=True)
+            metembed.add_field(name=":white_sun_small_cloud: Ceiling", value=f"`{ceiling}`", inline=True)
+            metembed.add_field(name=":thermometer: Temperature", value=f"`{temp}°C/{temp_f}°F`", inline=True)
+            metembed.add_field(name=":droplet: Dewpoint", value=f"`{dewpoint}°C/{dewpoint_f}°F`", inline=True)
+            metembed.add_field(name=":chart_with_upwards_trend: Barometer", value=f"`{altimq}/{altima}`", inline=True)
             metembed.set_footer(
                 text=f"Requested by {ctx.author.display_name} | For flight simulation only!",
                 icon_url=ctx.author.avatar_url

@@ -27,7 +27,7 @@ class departures(Cog):
         if len(ICAO.upper()) < 4:
             await ctx.replay("ICAO provided is not valid. Check ICAO code and try agin!")
 
-        if ICAO.upper() in airport:
+        if ICAO in airport:
             t = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
             xy = json.dumps(t)
             s = json.loads(xy)
@@ -45,7 +45,9 @@ class departures(Cog):
                         depe.add_field(name=":airplane: Route", value=f"`{item['flight_plan']['route']}`", inline=True)
                         await ctx.send(embed=depe)
             if not departures_exist:
-                await ctx.send(f"**There is no departures from {ICAO} at the moment!**")
+                no_depe = Embed(descrption=f":x: There is no departures from {ICAO.upper()} at the moment :x:", Colour=0xff0000)
+                await ctx.send(embed=no_depe)
+
     @Cog.listener()
     async def on_ready(self):
         print(f"{self.__class__.__name__} cog has been loaded\n-----")

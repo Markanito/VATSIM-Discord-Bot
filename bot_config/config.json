@@ -8,5 +8,6 @@
     "owner_id": "331516683258822658",
     "staff_role_name": "Staff",
     "discord_admin_role_name": "Admin",
-    "moderator_role_name": "Moderator"
+    "moderator_role_name": "Moderator",
+    "vatsim_api_key": ""
 }
