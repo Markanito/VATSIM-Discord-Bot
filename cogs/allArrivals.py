@@ -59,17 +59,8 @@ class allArrivals(Cog):
                             destairport = item['flight_plan']['arrival']
                             route = item['flight_plan']['route']
 
-                            #Status converter
-                            if int(item['groundspeed']) < 50:
-                                if distance < 10:
-                                    status = f"Arrived at destination"
-                                    color = Colour.green()
-                                else:
-                                    status = f"Preparing for the flight"
-                                    color = Colour.dark_orange()
-                            else:
-                                status = f"On the way"
-                                color = Colour.blue()
+
+
 
                             #Time Converter, please don't fuck with this
                             try:
@@ -103,7 +94,19 @@ class allArrivals(Cog):
                                 else:
                                     arrival_time = f"Plane is on the ground."
                             except:
-                                arrival_time = f"Plane is on the ground"   
+                                arrival_time = f"Plane is on the ground"
+
+                            #Status converter
+                            if int(item['groundspeed']) < 50:
+                                if distance < 10:
+                                    status = f"Arrived at destination"
+                                    color = Colour.green()
+                                else:
+                                    status = f"Preparing for the flight"
+                                    color = Colour.dark_orange()
+                            else:
+                                status = f"On the way"
+                                color = Colour.blue()
 
                             arr1e = Embed(colour = color)
                             arr1e.set_author(name="VATAdria Arrivals")

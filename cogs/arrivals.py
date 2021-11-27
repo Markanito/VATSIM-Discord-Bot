@@ -19,13 +19,13 @@ class arrivals(Cog):
     @command(name="arrivals", brief="Display arrivals into <ICAO> airport! <ICAO> is required!")
     @cooldown(2, 60, BucketType.user)
     async def arrivals(self, ctx, *, ICAO: str):
-        if len(ICAO.upper()) == 0:
+        if len(ICAO) == 0:
             await ctx.replay("Please provide ICAO code for an airport!")
 
-        if len(ICAO.upper()) > 4:
-            await ctx.replay("ICAO.upper() provided is not valid. Check ICAO code and try agin!")
+        if len(ICAO) > 4:
+            await ctx.replay("ICAO provided is not valid. Check ICAO code and try agin!")
 
-        if len(ICAO.upper()) < 4:
+        if len(ICAO) < 4:
             await ctx.replay("ICAO provided is not valid. Check ICAO code and try agin!")
 
         if ICAO in airport:
