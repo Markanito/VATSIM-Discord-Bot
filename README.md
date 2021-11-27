@@ -93,12 +93,12 @@ _Important notice! In `cogs/reload.py` replace line 10 with proper code based on
    git clone https://github.com/Markanito/VATSIM-Discord-Bot.git
    ```
 4. Install required packages (Make sure you have Python and Pip installed beofre installing packages!)
-   ```sh
-    pip install -r requirements.txt
+   ```sh 
+    pip install -r requirements.txt #Windows
    ```
    Or if you are on Linux based system
       ```sh
-    sudo pip install -r requirements.txt
+    sudo pip install -r requirements.txt #Linux
    ```
 5. Enter your bot token in  `bot_config/secrets.json`
    ```py
@@ -130,7 +130,7 @@ _Important notice! In `cogs/reload.py` replace line 10 with proper code based on
         "LYBA",
     }
    ```
-9. Run your bot by runing `python3.10 bot.py`
+9. Run your bot by runing `python3.10 bot.py` (_If you are running bot on Linux based server make sure you run it as root user or you may encounter errors with commands_)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -156,6 +156,19 @@ Don't forget to give the project a star! Thanks again!
 If you need any help setting up this bot you can always reach out to me via [VATSIM Adria Discord Server](https://discord.gg/nsBQcdY) (Username: Marko Tomicic - 1359931)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+
+<!---To Do-->
+## To Do
+
+There are some planned updates coming in the future which will happen soon or sometimes in future. It all depends on how much time I have on my hand to keep working on this project and ideas I have and all suggestions comming in from the rest of VATSIM community. 
+
+Here is list of planned updates for now:
+- [x] Add support for Slash commands
+- [x] Pagginated arrivals & departures embeds
+- [ ] Switch to Discord.py v2
+- [ ] Implement VATSIM API usage
+
+
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
