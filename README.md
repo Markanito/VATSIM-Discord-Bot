@@ -163,8 +163,8 @@ If you need any help setting up this bot you can always reach out to me via [VAT
 There are some planned updates coming in the future which will happen soon or sometimes in future. It all depends on how much time I have on my hand to keep working on this project and ideas I have and all suggestions comming in from the rest of VATSIM community. 
 
 Here is list of planned updates for now:
-- [x] Add support for Slash commands
-- [x] Pagginated arrivals & departures embeds
+- [ ] Add support for Slash commands
+- [ ] Pagginated arrivals & departures embeds
 - [ ] Switch to Discord.py v2
 - [ ] Implement VATSIM API usage
 
