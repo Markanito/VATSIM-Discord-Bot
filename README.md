@@ -76,15 +76,7 @@ This bot was built to be used by VATSIM vACC/ARTCC but I can't provide 1 bot you
 ### Installation
 
 _In order to make this bot work you follow instructions step by step!!_
-_Important notice! In `cogs/reload.py` replace line 10 with proper code based on where you host your bot!_
-   ```py
-    COGS = [path.split("/")[-1][:-3] for path in glob("./cogs/*.py")] #Linux based systems
-   ```
-   with
-
-   ```py
-    COGS = [path.split("\\")[-1][:-3] for path in glob("./cogs/*.py")] #Windows based systems
-   ```
+_There are 2 styles for allArrival & allDepartures commands which you can enable/disable by adding/removing `_` to file name. Current style will display all data in 1 single embed insted of sending embed for each flight comming in or out of your FIR._
 
 1. Create your bot on [Discord Developer POrtal](https://discord.com/developers/applications), once you created your bot navigate to Bot tab and make sure all Intents are turned on! Now you can invite it to your server and give it admin privilages!
 2. Get a free [CheckWX API Key](https://www.checkwxapi.com/)
@@ -104,7 +96,7 @@ _Important notice! In `cogs/reload.py` replace line 10 with proper code based on
    ```py
     "token": 'ENTER YOUR TOKEN'
    ```
-6. Enter roles names and channel ID's in  `bot_config/config.json` (Make sure to enable Discord Developer Mode to get text channel ID's)
+6. Edit config file in `bot_config/config.json` with all required data
    ```py
     "atc_channel": "781834455765483562",
     "bookings_channel": "781834455765483562",
@@ -112,9 +104,11 @@ _Important notice! In `cogs/reload.py` replace line 10 with proper code based on
     "news_channel": "781834455765483562",
     "sector_file_channel": "781834455765483562",
     "checkwx_api_key": "0b955dec24ccb45ede04524bec",
+    "owner_id": "331516683258822658",
     "staff_role_name": "Staff",
     "discord_admin_role_name": "Admin",
-    "moderator_role_name": "Moderator"
+    "moderator_role_name": "Moderator",
+    "vatsim_api_key": ""
    ```
 7. Enter airports ICAO code in `airports.json`
    ```py
@@ -163,8 +157,9 @@ If you need any help setting up this bot you can always reach out to me via [VAT
 There are some planned updates coming in the future which will happen soon or sometimes in future. It all depends on how much time I have on my hand to keep working on this project and ideas I have and all suggestions comming in from the rest of VATSIM community. 
 
 Here is list of planned updates for now:
+- [X] Put all arrivals & all departures into single embed
+- [ ] Put all bookings into single embed 
 - [ ] Add support for Slash commands
-- [ ] Pagginated arrivals & departures embeds
 - [ ] Switch to Discord.py v2
 - [ ] Implement VATSIM API usage
 

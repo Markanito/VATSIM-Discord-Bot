@@ -1,51 +1,40 @@
-import asyncio
-import math
-import requests
-import json
-import utils.json_loader
-from asyncio import sleep
-from discord import Embed, Colour
 from discord.ext.commands import Cog, command
+from discord import Embed, Colour
+from discord.ext import tasks
+from datetime import datetime, timezone, date, time
 from discord.ext.commands.cooldowns import BucketType
 from discord.ext.commands.core import cooldown
-from datetime import datetime, timezone, date, time
+import requests
+import json
+import math
 
-airport = utils.json_loader.read_json("airports")
+with open("airports.json") as json_file:
+    airport = json.load(json_file)
 
 url = "https://www.airport-data.com/api/ap_info.json?icao="
 
-class Arrivals(Cog):
+class allArrivals(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @command(name="allarrivalstest", description="Display all arrivals to Adria region!")
+    @command(name="allarrivals",brief="Display arrivals to Adria Region.")
     @cooldown(2, 60, BucketType.user)
-    async def allarrivalstest(self, ctx):
-        #First let's create embed with title and color so we can build it later on
-        async with ctx.typing():
-            resp = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
-            data = json.dumps(resp)
-            s = json.loads(data)
-            arrivals_exist = False
-            embed = Embed(
-                title=f"Arrivals to Adria Region",
-                color = Colour.blue(),
-            )
-
-            for item in s['pilots']:
-                if item['flight_plan'] != None:
-                    if item['flight_plan']['arrival'] in airport:
-                        try:
+    async def allarrivals(self, ctx,):
+            t = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
+            xy = json.dumps(t)
+            s = json.loads(xy)
+            try:
+                arrivals_exist = False
+                for item in s['pilots']:
+                    if item['flight_plan'] != None:
+                        if item['flight_plan']['arrival'] in airport:
                             arrivals_exist = True
-                            #This is just for BKPR airport as it is not correctly added to API
-                            if item['flight_plan']['arrival'] == "BKPR":
-                                arrival = "LYPR"
-                            else:
-                                arrival = item['flight_plan']['arrival']
-                            airport_data_url = f"{url}{arrival}"
+                            lan = 0.0
+                            long = 0.0
+                            airport_data_url = f"{url}{item['flight_plan']['arrival']}"
                             api_data = requests.get(airport_data_url).json()
-                            resp = json.dumps(api_data)
-                            api = json.loads(resp)
+                            data = json.dumps(api_data)
+                            api = json.loads(data)
                             lan = float(api['latitude'])
                             long = float(api['longitude'])
 
@@ -66,9 +55,10 @@ class Arrivals(Cog):
 
                             distance = R * c
                             callsign = item['callsign']
-                            departure = item['flight_plan']['departure']
-                            arrival = item['flight_plan']['arrival']
-                            
+                            depairport = item['flight_plan']['departure']
+                            destairport = item['flight_plan']['arrival']
+                            route = item['flight_plan']['route']
+
                             #ETA calculation, do not mess with this or it can cause wrong ETA calculations
                             if item['groundspeed'] > 40:
                                 time = int(distance) / int(item['groundspeed'])
@@ -100,36 +90,35 @@ class Arrivals(Cog):
                             else:
                                 arrival_time = f"Unknown"
 
-                            #Once everything is set, add fields to embed defined above and display it as a table
-                            embed.add_field(
-                                name=f":airplane: C/S:{' '} `{callsign}`{' '} | {' '}`:airplane_departure: ADEP {' '}`{departure}`{' '} | {' '}:airplane_arriving: ADES {' '}`{arrival}`{' '} | {' '}clock1: ETA: {' '}`{arrival_time}`",
-                                value="\uFEFF",
-                                inline=False
-                            )
-                        #In case there is error running the code it will display traceback of that error.
-                        except Exception as e:
-                            embed.add_field(
-                                name=f"Failed to load arrivals",
-                                value=f"{e}",
-                                inline=False
-                            ) 
-                        await asyncio.sleep(0.5)
-                        embed.set_footer(
-                            text=f"Requested by {ctx.author.display_name}",
-                            icon_url=ctx.author.avatar_url
-                        )
-            await ctx.send(embed=embed)
-            
-        if not arrivals_exist:
-            embed = Embed(
-                name=f":x: There is no arrivals to Adria Region!",
-                color = Colour.dark_red(),
-                timestamp = ctx.message.created_at
-            ) 
+                            #Status converter
+                            if int(item['groundspeed']) < 50:
+                                if distance < 10:
+                                    status = f"Arrived at destination"
+                                    color = Colour.green()
+                                else:
+                                    status = f"Preparing for the flight"
+                                    color = Colour.dark_orange()
+                            else:
+                                status = f"On the way"
+                                color = Colour.blue()
 
+                            arr1e = Embed(colour = color)
+                            arr1e.set_author(name="VATAdria Arrivals")
+                            arr1e.add_field(name=":id: Callsign", value=f"`{callsign}`", inline=False)
+                            arr1e.add_field(name=":airplane_departure: Departure Airport", value=f"`{depairport}`", inline=False)
+                            arr1e.add_field(name=":airplane_arriving: Destination Airport", value=f"`{destairport}`", inline=False)
+                            arr1e.add_field(name=":satellite_orbital: Status", value=f"`{status}`", inline=False)
+                            arr1e.add_field(name=":timer:Arrival Time", value=f"`{arrival_time}`", inline=False)
+                            arr1e.add_field(name=":airplane: Route", value=f"`{route}`", inline=False)
+                            await ctx.send(embed=arr1e)
+
+                if not arrivals_exist:
+                    await ctx.send('**There is no arrivals at the moment!**')
+
+            except Exception as e:
+                await ctx.send('There was exception running this command!\n`{}: {}`'.format(type(e).__name__, e))
     @Cog.listener()
     async def on_ready(self):
         print(f"{self.__class__.__name__} cog has been loaded.\n-----")
-
 def setup(bot):
-    bot.add_cog(Arrivals(bot))   
+    bot.add_cog(allArrivals(bot))
