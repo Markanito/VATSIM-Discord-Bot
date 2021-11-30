@@ -18,7 +18,7 @@ from utils.util import clean_code, Pag
 cwd = Path(__file__).parents[0]
 cwd = str(cwd)
 print(f"{cwd}\n----")
-COGS = [path.split("/")[-1][:-3] for path in glob(".cogs/*.py")]
+COGS = [path[:-3] for path in os.listdir('./cogs') if path[-3:] == '.py']
 
 
 intents = discord.Intents.all()
