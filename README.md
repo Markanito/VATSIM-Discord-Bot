@@ -110,7 +110,7 @@ _There are 2 styles for allArrival & allDepartures commands which you can enable
     "moderator_role_name": "Moderator",
     "vatsim_api_key": ""
    ```
-7. Enter airports ICAO code in `airports.json`
+7. Enter airports ICAO code in `bot_config/airports.json`
    ```py
     [
         "LJLJ", 
