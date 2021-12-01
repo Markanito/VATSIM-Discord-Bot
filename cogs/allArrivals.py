@@ -18,26 +18,25 @@ class Arrivals(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @command(name="allarrivalstest", description="Display all arrivals to Adria region!")
+    @command(name="allarrivals", description="Display all arrivals to Adria region!")
     @cooldown(2, 60, BucketType.user)
     async def allarrivalstest(self, ctx):
-        #First let's create embed with title and color so we can build it later on
-        async with ctx.typing():
-            resp = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
-            data = json.dumps(resp)
-            s = json.loads(data)
-            arrivals_exist = False
-            embed = Embed(
-                title=f"Arrivals to Adria Region",
-                color = Colour.blue(),
-            )
-
-            for item in s['pilots']:
-                if item['flight_plan'] != None:
-                    if item['flight_plan']['arrival'] in airport:
-                        try:
+        resp = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
+        data = json.dumps(resp)
+        s = json.loads(data)
+        arrivals_exist = False
+        for item in s['pilots']:
+            if item['flight_plan'] != None:
+                if item['flight_plan']['arrival'] in airport:
+                    try:
+                        with ctx.typing():
+                            embed = Embed(
+                                title="Arrival Table",
+                                color = Colour.blue(),
+                                timestamp = ctx.message.created_at
+                            )
                             arrivals_exist = True
-                            #This is just for BKPR airport as it is not correctly added to API
+                            #This is just a way to convert ICAO of BKPR to LYPR due to API differences in ICAO codes
                             if item['flight_plan']['arrival'] == "BKPR":
                                 arrival = "LYPR"
                             else:
@@ -68,7 +67,7 @@ class Arrivals(Cog):
                             callsign = item['callsign']
                             departure = item['flight_plan']['departure']
                             arrival = item['flight_plan']['arrival']
-                            
+                                
                             #ETA calculation, do not mess with this or it can cause wrong ETA calculations
                             if item['groundspeed'] > 40:
                                 time = int(distance) / int(item['groundspeed'])
@@ -102,30 +101,41 @@ class Arrivals(Cog):
 
                             #Once everything is set, add fields to embed defined above and display it as a table
                             embed.add_field(
-                                name=f":airplane: C/S:{' '} `{callsign}`{' '} | {' '}`:airplane_departure: ADEP {' '}`{departure}`{' '} | {' '}:airplane_arriving: ADES {' '}`{arrival}`{' '} | {' '}clock1: ETA: {' '}`{arrival_time}`",
+                                name=f":airplane: C/S:{' '} `{callsign}`\n:airplane_departure: ADEP {' '}`{departure}`\n:airplane_arriving: ADES {' '}`{arrival}`\n:clock1: ETA: {' '}`{arrival_time}`",
                                 value="\uFEFF",
                                 inline=False
                             )
-                        #In case there is error running the code it will display traceback of that error.
-                        except Exception as e:
-                            embed.add_field(
-                                name=f"Failed to load arrivals",
-                                value=f"{e}",
-                                inline=False
-                            ) 
-                        await asyncio.sleep(0.5)
-                        embed.set_footer(
-                            text=f"Requested by {ctx.author.display_name}",
-                            icon_url=ctx.author.avatar_url
-                        )
+                    #In case there is error running the code it will display traceback of that error.
+                    except Exception as e:
+                        embed.add_field(
+                            name=f"Failed to load arrivals",
+                            value=f"{e}",
+                            inline=False
+                        ) 
+                    await asyncio.sleep(0.5)
+                    embed.set_footer(
+                        text=f"Requested by {ctx.author.display_name}",
+                        icon_url=ctx.author.avatar_url
+                    )
+        if arrivals_exist:
+            await ctx.send(embed=embed)
+        else:
+            embed = Embed(
+                title=f"Arrivals Table",
+                color = Colour.blue(),
+                timestamp = ctx.message.created_at
+            )
+            embed.add_field(
+                name=f":x: No arrivals at the moment. :x:",
+                value=f"\uFEFF",
+                inline=False
+            )
+            embed.set_footer(
+                text=f"Requested by {ctx.author.display_name}",
+                icon_url=ctx.author.avatar_url
+            )
             await ctx.send(embed=embed)
             
-        if not arrivals_exist:
-            embed = Embed(
-                name=f":x: There is no arrivals to Adria Region!",
-                color = Colour.dark_red(),
-                timestamp = ctx.message.created_at
-            ) 
 
     @Cog.listener()
     async def on_ready(self):
