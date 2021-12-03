@@ -2,28 +2,35 @@ import contextlib
 import io
 import os
 import logging
-from glob import glob
 import textwrap
-from traceback import format_exception
+import json
+import requests
+import utils.json_loader
 import discord
-from discord.ext import commands
+
+from discord import Intents, Embed, Colour, DMChannel
+from traceback import format_exception
+from discord.ext import commands, tasks
 from discord.ext.commands import CommandNotFound, BadArgument, MissingRequiredArgument, has_role, MissingRole, command
+from discord.ext.commands import Bot
 from discord.errors import Forbidden, HTTPException
 from discord.ext.commands.errors import CommandOnCooldown
 from pathlib import Path
-import utils.json_loader
 from utils.util import clean_code, Pag
 
-#_____________________________________________________________________________________________________________________________________________________________________________#
+#Definig config local variables needed
 cwd = Path(__file__).parents[0]
 cwd = str(cwd)
-print(f"{cwd}\n----")
 COGS = [path[:-3] for path in os.listdir('./cogs') if path[-3:] == '.py']
-
+secret_file = utils.json_loader.read_json("secrets")
+config_file = utils.json_loader.read_json("config")
 
 intents = discord.Intents.all()
-DEFAULTPREFIX = "!"
-secret_file = utils.json_loader.read_json("secrets")
+DEFAULTPREFIX = config_file['default_prefix']
+
+async def get_prefix(bot, message):
+    if not message.guild:
+        return commands.when_mentioned_or(bot.DEFAULTPREFIX)(bot, message)
 
 async def get_prefix(bot, message):
     if not message.guild:
@@ -38,26 +45,22 @@ async def get_prefix(bot, message):
     except:
         return commands.when_mentioned_or(bot.DEFAULTPREFIX)(bot, message)
 
-DEFAULTPREFIX = "!"
-secret_file = utils.json_loader.read_json("secrets")
-
-bot = commands.Bot(
+bot = Bot(
     command_prefix=get_prefix,
     case_insensitive=True,
-    owner_id=int(secret_file['owner_id']),
+    owner_id=int(config_file['owner_id']),
     help_command=None,
     intents=intents
 )
 
-bot.config_token = secret_file["token"]
-
+#Define bot paramethers from config files
 bot.DEFAULTPREFIX = DEFAULTPREFIX
 bot.cwd = cwd
+bot.version = "4.0"
+bot.token = secret_file['token']
 bot.blacklisted_users = []
 bot.muted_users = {}
-bot.version = "3.0"
 
-#Colors for the bot, so we don't need to request it from other sources
 bot.colors = {
     "WHITE": 0xFFFFFF,
     "AQUA": 0x1ABC9C,
@@ -81,14 +84,20 @@ bot.colors = {
 }
 bot.color_list = [c for c in bot.colors.values()]
 
+
+#Define bot events
 @bot.event
 async def on_ready():
     #When bot is ready
     print(
         f"-----\nLogged in as: {bot.user.name} : {bot.user.id}\n-----My current prefix is {bot.DEFAULTPREFIX}\n-----"
     )
+    data = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
+    resp = json.dumps(data)
+    s = json.loads(resp)
+    users = s['general']['unique_users']
     await bot.change_presence(
-        activity=discord.Game(name="Watching !help")
+        activity=discord.Activity(type=discord.ActivityType.watching, name=f"{users} VATSIM Users")
     )
     for cog in COGS:
         try:
@@ -98,12 +107,12 @@ async def on_ready():
         except Exception as e:
             print('{}: {}'.format(type(e).__name__, e))
 
+
 @bot.event
 async def on_message(message):
     # Ignore messages sent by yourself
     if message.author.bot:
         return
-
     # A way to blacklist users from the bot by not processing commands
     # if the author is in the blacklisted_users list
     if message.author.id in bot.blacklisted_users:
@@ -121,48 +130,7 @@ async def on_message(message):
         await message.channel.send(f"My prefix here is `{prefix}`", delete_after=15)
 
     await bot.process_commands(message)
-
-
-@bot.command(name="eval", aliases=["exec"], description="Evaluates the code you provided!")
-@commands.is_owner()
-async def _eval(ctx, *, code):
-    await ctx.reply("Let me evaluate this code for you! Won't be a sec")
-    code = clean_code(code)
-
-    local_variables = {
-        "discord": discord,
-        "commands": commands,
-        "bot": bot,
-        "ctx": ctx,
-        "channel": ctx.channel,
-        "author": ctx.author,
-        "guild": ctx.guild,
-        "message": ctx.message,
-    }
-
-    stdout = io.StringIO()
-
-    try:
-        with contextlib.redirect_stdout(stdout):
-            exec(
-                f"async def func():\n{textwrap.indent(code, '    ')}", local_variables,
-            )
-
-            obj = await local_variables["func"]()
-            result = f"{stdout.getvalue()}\n-- {obj}\n"
-    except Exception as e:
-        result = "".join(format_exception(e, e, e.__traceback__))
-
-    pager = Pag(
-        timeout=100,
-        entries=[result[i : i + 2000] for i in range(0, len(result), 2000)],
-        length=1,
-        prefix="```py\n",
-        suffix="```",
-    )
-
-    await pager.start(ctx)
-
+    
 @bot.event
 async def on_command_error(ctx: commands.Context, exc: Exception):
     if isinstance(exc, CommandNotFound):
@@ -197,4 +165,4 @@ if __name__ == "__main__":
         if file.endswith(".py") and not file.startswith("_"):
             bot.load_extension(f"cogs.{file[:-3]}")
 
-bot.run(bot.config_token)
+bot.run(bot.token)

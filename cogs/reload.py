@@ -10,7 +10,8 @@ import utils.json_loader
 import traceback
 
 #Where COGS files are saved 
-COGS = [path[:-3] for path in os.listdir('./cogs') if path[-3:] == '.py']
+COGS = [path.split("/")[-1][:-3] for path in glob("./cogs/*.py")]
+
 
 #Roles allowed to use this commands, for now only discord admins can do this!
 bot_config_file = utils.json_loader.read_json("config")
