@@ -99,23 +99,23 @@ class metar(Cog):
                     ceiling = ''.join(f"{item['ceiling']['text']} at {item['ceiling']['feet']}\n")
             except:
                 ceiling = f'No ceiling observed'
-
-            metembed = Embed(title=f"Decoded METAR for {station_id}", description=f"RAW METAR: `{raw_text}`\n\n **__METAR valid {metar_time}z\n\n__**\n_Flight Category = {flight_category}_", colour=color)
-            metembed.add_field(name=":wind_blowing_face:  Wind", value=f"`{winds}`", inline=True)
-            metembed.add_field(name=":fog: Visibility", value=f"`{visibility}`", inline=True)
-            metembed.add_field(name=":umbrella: Humidity", value=f"`{humidity}%`", inline=True)
-            metembed.add_field(name=":cloud: Clouds", value=f"`{clouds}`", inline=True)
-            metembed.add_field(name=":cloud_rain: Weather", value=f"`{condition}`", inline=True)
-            metembed.add_field(name=":white_sun_small_cloud: Ceiling", value=f"`{ceiling}`", inline=True)
-            metembed.add_field(name=":thermometer: Temperature", value=f"`{temp}°C/{temp_f}°F`", inline=True)
-            metembed.add_field(name=":droplet: Dewpoint", value=f"`{dewpoint}°C/{dewpoint_f}°F`", inline=True)
-            metembed.add_field(name=":chart_with_upwards_trend: Barometer", value=f"`{altimq}/{altima}`", inline=True)
-            metembed.set_footer(
-                text=f"Requested by {ctx.author.display_name} | For flight simulation only!",
-                icon_url=ctx.author.avatar_url
-            )
-            await ctx.send(embed=metembed)
-            
+            with ctx.typing():
+                metembed = Embed(title=f"Decoded METAR for {station_id}", description=f"RAW METAR: `{raw_text}`\n\n **__METAR valid {metar_time}z\n\n__**\n_Flight Category = {flight_category}_", colour=color)
+                metembed.add_field(name=":wind_blowing_face:  Wind", value=f"`{winds}`", inline=True)
+                metembed.add_field(name=":fog: Visibility", value=f"`{visibility}`", inline=True)
+                metembed.add_field(name=":umbrella: Humidity", value=f"`{humidity}%`", inline=True)
+                metembed.add_field(name=":cloud: Clouds", value=f"`{clouds}`", inline=True)
+                metembed.add_field(name=":cloud_rain: Weather", value=f"`{condition}`", inline=True)
+                metembed.add_field(name=":white_sun_small_cloud: Ceiling", value=f"`{ceiling}`", inline=True)
+                metembed.add_field(name=":thermometer: Temperature", value=f"`{temp}°C/{temp_f}°F`", inline=True)
+                metembed.add_field(name=":droplet: Dewpoint", value=f"`{dewpoint}°C/{dewpoint_f}°F`", inline=True)
+                metembed.add_field(name=":chart_with_upwards_trend: Barometer", value=f"`{altimq}/{altima}`", inline=True)
+                metembed.set_footer(
+                    text=f"Requested by {ctx.author.display_name} | For flight simulation only!",
+                    icon_url=ctx.author.avatar_url
+                )
+                await ctx.send(embed=metembed)
+                
     @Cog.listener()
     async def on_ready(self):
         print(f"{self.__class__.__name__} cog has been loaded\n-----")

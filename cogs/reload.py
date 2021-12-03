@@ -12,7 +12,6 @@ import traceback
 #Where COGS files are saved 
 COGS = [path[:-3] for path in os.listdir('./cogs') if path[-3:] == '.py']
 
-
 #Roles allowed to use this commands, for now only discord admins can do this!
 bot_config_file = utils.json_loader.read_json("config")
 admin_role = bot_config_file["discord_admin_role_name"]
