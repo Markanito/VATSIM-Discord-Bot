@@ -71,7 +71,7 @@ class bookings(Cog):
             booking_end = f"{booking_end_hour}:{booking_end_minute}"
             booking_date = f"{booking_start_day}.{booking_start_month}"
 
-            with ctx.typing():
+            async with ctx.typing():
                 embed = Embed(
                     title=f"Bookings Table",
                     color = Colour.dark_red(),
@@ -97,7 +97,7 @@ class bookings(Cog):
         if bookings_exists:
             await ctx.send(embed=embed)
         else:
-            with ctx.typing():
+            async with ctx.typing():
                 embed = Embed(
                     title=f"Bookings Table",
                     color = Colour.dark_red(),
