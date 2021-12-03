@@ -11,8 +11,8 @@ bot_config_file = utils.json_loader.read_json("config")
 bookings_channel_id = bot_config_file["bookings_channel"]
 
 
-with open("callsign_prefix.json") as json_file:
-    callsign_prefix = json.load(json_file)
+callsign_prefix = utils.json_loader.read_json("callsign_prefix")
+
 positions = ["GND","TWR","APP","CTR"]
 booked_cs = []
 
@@ -82,11 +82,14 @@ class atcBookings(Cog):
             #Check if booking is removed!
             for i in booked_cs:
                 if i not in booked_2_cs:
-                    booked_cs.remove(i)
-                    bookremove = discord.Embed(title="VATAdria Booking Annoucement", description=f":x:`ATC Booking was removed!` :x:", color=0xff9500)
-                    bookremove.add_field(name=":id: Callsign", value=f"{i}", inline=True)
-                    channel = self.bot.get_channel(int(bookings_channel_id))
-                    await channel.send(embed=bookremove)
+                    if booking_end.day < datetime.now().day:
+                        booked_cs.remove(i)
+                    else:
+                        booked_cs.remove(i)
+                        bookremove = discord.Embed(title="VATAdria Booking Annoucement", description=f":x:`ATC Booking was removed!` :x:", color=0xff9500)
+                        bookremove.add_field(name=":id: Callsign", value=f"{i}", inline=True)
+                        channel = self.bot.get_channel(int(bookings_channel_id))
+                        await channel.send(embed=bookremove)
         except:
             pass
 

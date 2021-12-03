@@ -101,7 +101,7 @@ class Arrivals(Cog):
 
                             #Once everything is set, add fields to embed defined above and display it as a table
                             embed.add_field(
-                                name=f":airplane: C/S:{' '} `{callsign}`\n:airplane_departure: ADEP {' '}`{departure}`\n:airplane_arriving: ADES {' '}`{arrival}`\n:clock1: ETA: {' '}`{arrival_time}`",
+                                name=f":airplane: C/S:{' '} `{callsign}`{' '} |{' '} :airplane_departure: ADEP {' '}`{departure}`{' '}  | {' '} :airplane_arriving: ADES {' '}`{arrival}`{' '} | {' '} :clock1: ETA: {' '}`{arrival_time}`",
                                 value="\uFEFF",
                                 inline=False
                             )

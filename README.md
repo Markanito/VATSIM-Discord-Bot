@@ -76,9 +76,9 @@ This bot was built to be used by VATSIM vACC/ARTCC but I can't provide 1 bot you
 ### Installation
 
 _In order to make this bot work you follow instructions step by step!!_
-_There are 2 styles for allArrival & allDepartures commands which you can enable/disable by adding/removing `_` to file name. Current style will display all data in 1 single embed insted of sending embed for each flight comming in or out of your FIR._
+_If you wish to use feature where bot will send few messages when it joins the server make sure to edit `cogs/on_server_join.py` with all your info and messages!_
 
-1. Create your bot on [Discord Developer POrtal](https://discord.com/developers/applications), once you created your bot navigate to Bot tab and make sure all Intents are turned on! Now you can invite it to your server and give it admin privilages!
+1. Create your bot on [Discord Developer POrtal](https://discord.com/developers/applications)
 2. Get a free [CheckWX API Key](https://www.checkwxapi.com/)
 3. Clone the repo
    ```sh
@@ -117,14 +117,15 @@ _There are 2 styles for allArrival & allDepartures commands which you can enable
         "LJMB",
     }
    ```
-8. Enter ATC Callsigns in `callsign_prefix.json`
+8. Enter ATC Callsigns in `bot_config/callsign_prefix.json`
    ```py
     [
         "LDZO", 
         "LYBA",
     }
    ```
-9. Run your bot by runing `python3.10 bot.py` (_If you are running bot on Linux based server make sure you run it as root user or you may encounter errors with commands_)
+9. Run your bot by runing `python3.10 bot.py`
+10. Invite your bot to your server and have fun!
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -158,7 +159,7 @@ There are some planned updates coming in the future which will happen soon or so
 
 Here is list of planned updates for now:
 - [X] Put all arrivals & all departures into single embed
-- [ ] Put all bookings into single embed 
+- [X] Put all bookings into single embed 
 - [ ] Add support for Slash commands
 - [ ] Switch to Discord.py v2
 - [ ] Implement VATSIM API usage

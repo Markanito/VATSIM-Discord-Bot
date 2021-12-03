@@ -8,8 +8,7 @@ import time
 import json
 import utils.json_loader
 
-with open("callsign_prefix.json") as json_file:
-    callsign_prefix = json.load(json_file)
+callsign_prefix = utils.json_loader.read_json("callsign_prefix")
 positions = ["GND","TWR","APP","CTR"]
 online_cs = []
 
