@@ -21,51 +21,51 @@ class departures(Cog):
     @cooldown(2, 60, BucketType.user)
     async def departures(self, ctx, *, ICAO: str):
         if len(ICAO.upper()) == 0:
-            await ctx.replay("Please provide ICAO code for an airport!")
+            await ctx.reply("Please provide ICAO code for an airport!")
 
         if len(ICAO.upper()) > 4:
-            await ctx.replay("ICAO provided is not valid. Check ICAO code and try agin!")
+            await ctx.reply("ICAO provided is not valid. Check ICAO code and try agin!")
 
         if len(ICAO.upper()) < 4:
-            await ctx.replay("ICAO provided is not valid. Check ICAO code and try agin!")
+            await ctx.reply("ICAO provided is not valid. Check ICAO code and try agin!")
 
         if ICAO in airport:
             t = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
             xy = json.dumps(t)
             s = json.loads(xy)
             departures_exist = False
+            async with ctx.typing():
+                embed = Embed(
+                    title=f"Departure Table for {ICAO.upper()}",
+                    color = Colour.orange(),
+                    timestamp = ctx.message.created_at
+                ) 
             for item in s['pilots']:
                 if item['flight_plan'] != None:
                     if item['flight_plan']['departure'] == (ICAO.upper()):
                         if item['groundspeed'] < 50:
                             try:
-                                async with ctx.typing():
-                                    embed = Embed(
-                                        title=f"Departure Table for {ICAO.upper()}",
-                                        color = Colour.orange(),
-                                        timestamp = ctx.message.created_at
-                                    )
-                                    departures_exist = True
-                                    callsign = item['callsign']
-                                    departure = item['flight_plan']['departure']
-                                    arrival = item['flight_plan']['arrival']
-                                    if item['flight_plan']['deptime'] == "0000":
-                                        depa_time = f"Departure time unknown"
-                                    else:
-                                        depa_time = item['flight_plan']['deptime']
+                                
+                                departures_exist = True
+                                callsign = item['callsign']
+                                departure = item['flight_plan']['departure']
+                                arrival = item['flight_plan']['arrival']
+                                if item['flight_plan']['deptime'] == "0000":
+                                    depa_time = f"Departure time unknown"
+                                else:
+                                    depa_time = item['flight_plan']['deptime']
                                     
-                                    embed.add_field(
-                                        name=f":airplane: C/S:{' '} `{callsign}` {' '} | {' '}:airplane_departure: ADEP {' '}`{departure}`{' '} | {' '}:airplane_arriving: ADES: {' '}`{arrival}`{' '}| {' '} :clock1: ETD: {' '}`{depa_time}z`",
-                                        value="\uFEFF",
-                                        inline=False
-                                    )
+                                embed.add_field(
+                                    name=f":airplane: C/S:{' '} `{callsign}` {' '} | {' '}:airplane_departure: ADEP {' '}`{departure}`{' '} | {' '}:airplane_arriving: ADES: {' '}`{arrival}`{' '}| {' '} :clock1: ETD: {' '}`{depa_time}z`",
+                                    value="\uFEFF",
+                                    inline=False
+                                )
                             except Exception as e:
                                 embed.add_field(
                                     name=f"Failed to load arrivals",
                                     value=f"{e}",
                                     inline=False  
                                 )
-                            await asyncio.sleep(0.5)
                             embed.set_footer(
                                 text=f"Requested by {ctx.author.display_name}",
                                 icon_url=ctx.author.avatar_url
@@ -98,16 +98,19 @@ class departures(Cog):
         resp = json.dumps(data)
         s = json.loads(resp)    
         deparutres_exist = False
+        async with ctx.typing():
+            embed = Embed(
+                title="Departure Table",
+                color = Colour.orange(),
+                timestamp = ctx.message.created_at
+            )
+                    
         for item in s['pilots']:
             if item['flight_plan'] != None:
-                if item['flight_plan']['departure'] in airport and item['groundspeed'] < 50:
-                    try:
-                        async with ctx.typing():
-                            embed = Embed(
-                                title="Departure Table",
-                                color = Colour.orange(),
-                                timestamp = ctx.message.created_at
-                            )
+                if item['flight_plan']['departure'] in airport:
+                    if item['groundspeed'] < 50:
+
+                        try:
                             deparutres_exist=True
                             callsign = item['callsign']
                             departure = item['flight_plan']['departure']
@@ -123,20 +126,17 @@ class departures(Cog):
                                 value="\uFEFF",
                                 inline=False
                             )
-                    except Exception as e:
-                        embed.add_field(
-                        name=f"Failed to load arrivals",
-                            value=f"{e}",
-                            inline=False
+                        except Exception as e:
+                            embed.add_field(
+                            name=f"Failed to load arrivals",
+                                value=f"{e}",
+                                inline=False
+                            )
+                        embed.set_footer(
+                            text=f"Requested by {ctx.author.display_name}",
+                            icon_url=ctx.author.avatar_url
                         )
-                    await asyncio.sleep(0.5)
-                    embed.set_footer(
-                        text=f"Requested by {ctx.author.display_name}",
-                        icon_url=ctx.author.avatar_url
-                    )
-        if deparutres_exist:
-            await ctx.send(embed=embed)
-        else:
+        if not deparutres_exist:
             async with ctx.typing():
                 embed = Embed(
                     title=f"Departure Table",
@@ -153,10 +153,12 @@ class departures(Cog):
                     icon_url=ctx.author.avatar_url
                 )
                 await ctx.send(embed=embed)
+        else:
+            await ctx.send(embed=embed)
 
     @Cog.listener()
     async def on_ready(self):
         print(f"{self.__class__.__name__} cog has been loaded.\n-----")
         
 def setup(bot):
-    bot.add_cog(departures(bot))   
+    bot.add_cog(departures(bot))
