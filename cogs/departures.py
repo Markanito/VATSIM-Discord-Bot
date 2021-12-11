@@ -29,7 +29,7 @@ class departures(Cog):
         if len(ICAO.upper()) < 4:
             await ctx.reply("ICAO provided is not valid. Check ICAO code and try agin!")
 
-        if ICAO in airport:
+        if ICAO.upper() in airport:
             t = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
             xy = json.dumps(t)
             s = json.loads(xy)
