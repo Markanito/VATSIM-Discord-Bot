@@ -1,3 +1,4 @@
+from typing import final
 from discord import Embed, Colour
 import requests
 import json
@@ -10,7 +11,7 @@ bot_config_file = utils.json_loader.read_json("config")
 checkwxapikey = bot_config_file["checkwx_api_key"]
 
 
-url = "https://api.checkwx.com/metar/"
+
 rule= "/decoded?pretty=1"
 hdr = { 'X-API-Key': checkwxapikey }
 
@@ -21,7 +22,7 @@ class metar(Cog):
 
     @command(name="metar", description="Get decoded METAR for <ICAO> airport")
     async def metar(self, ctx, *, ICAO: str):
-
+        url = "https://api.checkwx.com/metar/"
         final_url = f"{url}{ICAO.upper()}{rule}"
         req = requests.get(final_url, headers=hdr).json()
         x = json.dumps(req)
@@ -121,17 +122,19 @@ class metar(Cog):
     #TAF Command
     @command(name="taf", description="Get decoded taf for airport")
     async def taf(self, ctx, *, ICAO: str):
+        url = "https://api.checkwx.com/taf/"
         final_url = f"{url}{ICAO}{rule}"
         req = requests.get(final_url, headers=hdr).json()
         x = json.dumps(req)
         s = json.loads(x)
+        print(s)
         for item in s['data']:
             async with ctx.typing():
                 station_id = item['station']['name']
                 raw_taf = item['raw_text']
                 taf = pytaf.TAF(raw_taf)
                 decoder = pytaf.Decoder(taf)
-
+                print(raw_taf)
                 taf_embed = Embed(title=f"Decoded TAF for {item['icao']} aerodrome", description=f"\nRAW TAF: `{item['raw_text']}`\n\n\n __Decoded TAF__\n\n**{decoder.decode_taf()}**\n\n", colour=0x4c00ff)
                 taf_embed.set_footer(
                     text=f"Requested by {ctx.author.display_name} | For flight simulation only!",
