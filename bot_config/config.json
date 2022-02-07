@@ -9,5 +9,6 @@
     "staff_role_name": "Staff",
     "discord_admin_role_name": "Admin",
     "moderator_role_name": "Moderator",
-    "vatsim_api_key": ""
+    "vatsim_api_key": "",
+    "default_prefix": "!"
 }
