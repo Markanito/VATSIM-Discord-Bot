@@ -1,13 +1,15 @@
+from hikari import PresenceUpdateEvent
 import requests
 import json
 import discord
-from discord.ext.commands import Cog
-from discord.ext import tasks
+
+from discord.ext import tasks, commands
+from helpers.config import GUILD_ID
 
 #This will update bot presence every 5 minutes with how many unique VATSIM users are online. This can be disabled by adding _ in front of the filename
 
-class Update(Cog):
-    def __init__(self, bot):
+class Update(commands.Cog):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.update_presence.start()
 
@@ -27,8 +29,11 @@ class Update(Cog):
         except:
             print(f"Bot instance not found, skipping presence update for now!")
 
-    @Cog.listener()
+    @commands.Cog.listener()
     async def on_ready(self):
         print(f"{self.__class__.__name__} cog has been loaded\n-----")
-def setup(bot):
-    bot.add_cog(Update(bot))
+
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(
+        Update(bot),
+        guilds= [discord.Object(id=GUILD_ID)])

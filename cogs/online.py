@@ -1,14 +1,14 @@
-import asyncio
+import discord
 import requests
 import json
 import utils.json_loader
-from asyncio import sleep
-from discord import Embed
-from discord.ext.commands import Cog, command
+
+from discord import app_commands, Embed, Colour
+from discord.ext import commands
+from helpers.config import GUILD_ID, VATADR_RED, VATADR_BLUE
 
 callsign_prefix = utils.json_loader.read_json("callsign_prefix")
-
-positions = ["GND","TWR","APP","CTR"]
+positions = ["GND", "TWR", "APP", "CTR"]
 
 class Controller():
     def __init__(self, callsign, controller_name, frequency):
@@ -22,12 +22,20 @@ class Controller():
     def get_frequency(self):
         return self.frequency
 
-class online(Cog):
-    def __init__(self, bot):
+class Online(commands.Cog):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-
-    @command(name="online", description="Display online controllers.")
-    async def online(self, ctx):
+    
+    @app_commands.command(
+        name="online",
+        description="Display all online controllers"
+    )
+    async def online(
+        self,
+        interaction: discord.Interaction,
+        private: bool = False
+    ):
+        await interaction.response.defer(thinking=True, ephemeral=private)
         t = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
         xy = json.dumps(t)
         s = json.loads(xy)
@@ -38,48 +46,39 @@ class online(Cog):
             callsign = item['callsign']
             frequency = item['frequency']
             controller_name = item['name']
-            with ctx.typing():
-                embed = Embed(
-                    title=f"Online ATC Table",
-                    color = 0x4c00ff,
-                    timestamp = ctx.message.created_at
-                )
-                for i in callsign_prefix:
-                    if i == callsign[:len(i)] and callsign[-3:] in positions:
-                        controller_obj = Controller(callsign, controller_name, frequency)
-                        online_2_obj.append(controller_obj)
-                        online_2_cs.append(callsign)
+            embed = Embed(
+                title=f"Online ATC Table",
+                color = VATADR_BLUE,
+            )
+            for i in callsign_prefix:
+                if i == callsign[:len(i)] and callsign[-3:] in positions:
+                    controller_obj = Controller(callsign, controller_name, frequency)
+                    online_2_obj.append(controller_obj)
+                    online_2_cs.append(callsign)
                     
-                for i in online_2_obj:
-                    online_exists=True
-                    embed.add_field(
-                        name=f":id: {' '}C/S: {' '} `{i.get_callsign()}`{' '} | {' '} :man: ATCO: {' '} `{i.get_controller_name()}`{' '} | {' '} :radio: {' '} FREQ: {' '} `{i.get_frequency()}`",
-                        value=f"\uFEFF",
-                        inline=False
-                    )
-                    embed.set_footer(
-                        text=f"Requested by {ctx.author.display_name}",
-                        icon_url=ctx.author.avatar_url
-                    )
+            for i in online_2_obj:
+                online_exists=True
+                embed.add_field(
+                    name=f":id: {' '}C/S: {' '} `{i.get_callsign()}`{' '} | {' '} :man: ATCO: {' '} `{i.get_controller_name()}`{' '} | {' '} :radio: {' '} FREQ: {' '} `{i.get_frequency()}`",
+                    value=f"\uFEFF",
+                    inline=False
+                )
 
         if online_exists:
-            await ctx.send(embed=embed)
+            await interaction.followup.send(embed=embed)
         else:
-            with ctx.typing():
-                embed = Embed(
-                    title=f":x: No controllers online at the moment. :x:",
-                    color = 0x4c00ff,
-                    timestamp = ctx.message.created_at
-                )
-                embed.set_footer(
-                    text=f"Requested by {ctx.author.display_name}",
-                    icon_url=ctx.author.avatar_url
-                )
-                await ctx.send(embed=embed)
-
-    @Cog.listener()
+            embed = Embed(
+                title=f":x: No controllers online at the moment. :x:",
+                color = VATADR_RED
+            )
+            await interaction.followup.send(embed=embed)
+            
+    @commands.Cog.listener()
     async def on_ready(self):
-        print(f"{self.__class__.__name__} cog has been loaded\n-----")
-def setup(bot):
-    bot.add_cog(online(bot))
-
+        print(f"{self.__class__.__name__} cog has been loaded.\n-----")
+        
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(
+        Online(bot),
+        guilds= [discord.Object(id=GUILD_ID)])
+        

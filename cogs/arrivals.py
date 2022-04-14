@@ -1,60 +1,57 @@
-import asyncio
 import requests
 import json
-import utils.json_loader
 import math
+import discord
+import utils.json_loader
+
 from asyncio import sleep
-from discord.ext.commands import Cog, command
-from discord import Embed, Colour
-from discord.ext.commands.cooldowns import BucketType
 from datetime import datetime, date, time, timezone
-from discord.ext.commands.core import cooldown
+from discord.ext import commands
+from discord import Embed, Colour
+from discord import app_commands
+from helpers.config import VATADR_BLUE, GUILD_ID, VATADR_RED
 
-airport = utils.json_loader.read_json("airports")
+airports = utils.json_loader.read_json("airports")
+url = "https://www.airport-data.com/api/ap_info.json?icao=" #API to obtain airport coordinates
 
-url=url = "https://www.airport-data.com/api/ap_info.json?icao=" #API to obtain airport coordinates
-
-class arrivals(Cog):
-    def __init__(self, bot):
+class Arrivals(commands.Cog):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-    
-    #Arrivals command which display only arrivals into selected airport!
-    @command(name="arrivals", description="Display all arrivans to <ICAO> airport. <ICAO> is required!")
-    @cooldown(2, 60, BucketType.user)
-    async def arrivals(self, ctx, *, ICAO: str):
-        if len(ICAO.upper()) == 0:
-            await ctx.reply("Please provide ICAO code for an airport!")
 
-        if len(ICAO.upper()) > 4:
-            await ctx.reply("ICAO provided is not valid. Check ICAO code and try agin!")
-
-        if len(ICAO.upper()) < 4:
-            await ctx.reply("ICAO provided is not valid. Check ICAO code and try agin!")
-
-        if ICAO.upper() in airport:
+    @app_commands.command(
+        name="arrivals",
+        description="Get arrivals to desired airport"
+    )
+    async def arrivals(
+        self,
+        interaction: discord.Interaction,
+        airport: str,
+        private: bool = False
+    ) -> None:
+        await interaction.response.defer(thinking=True, ephemeral=private)
+        if airport in airport:
             t = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
             xy = json.dumps(t)
             s = json.loads(xy)
             arrivals_exist = False
-            async with ctx.typing():
-                embed = Embed(
-                    title=f"Arrival Table for {ICAO.upper()}",
-                    color = Colour.blue(),
-                    timestamp = ctx.message.created_at
-                )
+
+            embed = Embed(
+                title=f"Arrival Table for {airport.upper()}",
+                color = VATADR_RED,
+            )
             for item in s['pilots']:
                 if item['flight_plan'] != None:
-                    if item['flight_plan']['arrival'] == (ICAO.upper()):
+                    if item['flight_plan']['arrival'] == (airport.upper()):
                         try:
 
                             arrivals_exist = True
-                            #This is just a way to convert ICAO of BKPR to LYPR due to API differences in ICAO codes
+                            #This is just a way to convert airport of BKPR to LYPR due to API differences in airport codes
                             if item['flight_plan']['arrival'] == "BKPR":
                                 arrival = "LYPR"
                             else:
                                 arrival = item['flight_plan']['arrival']
                                 
-                            airport_data_url = f"{url}{ICAO}"
+                            airport_data_url = f"{url}{airport}"
                             api_data = requests.get(airport_data_url).json()
                             resp = json.dumps(api_data)
                             api = json.loads(resp)
@@ -131,56 +128,49 @@ class arrivals(Cog):
                                 value=f"{e}",
                                 inline=False
                             ) 
-                        embed.set_footer(
-                            text=f"Requested by {ctx.author.display_name}",
-                            icon_url=ctx.author.avatar_url
-                        )
-        if arrivals_exist:
-            await ctx.send(embed=embed)
-        else:
-            async with ctx.typing():
+            if arrivals_exist:
+                await interaction.followup.send(embed=embed)
+            else:
                 embed = Embed(
-                    title=f"Arrivals Table for {ICAO.upper()}",
-                    color = Colour.blue(),
-                    timestamp = ctx.message.created_at
+                    title=f"Arrivals Table for {airport.upper()}",
+                    color = VATADR_RED,
                 )
                 embed.add_field(
                     name=f":x: No arrivals at the moment. :x:",
                     value=f"\uFEFF",
                     inline=False
                 )
-                embed.set_footer(
-                    text=f"Requested by {ctx.author.display_name}",
-                    icon_url=ctx.author.avatar_url
-                )
-                await ctx.send(embed=embed)
-                        
-    #All arrivals command which display all arrivals
+                await interaction.followup.send(embed=embed)
 
-    @command(name="allarrivals", description="Display all arrivals to Adria region!")
-    @cooldown(2, 60, BucketType.user)
-    async def allarrivalstest(self, ctx):
+    @app_commands.command(
+        name="allarrivals",
+        description="Get all arrivals"
+    )
+    async def allarrivals(
+        self,
+        interaction: discord.Interaction,
+        private: bool = False
+    ):
+        await interaction.response.defer(thinking=True, ephemeral=private)
         resp = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
         data = json.dumps(resp)
         s = json.loads(data)
         arrivals_exist = False
-        async with ctx.typing():
-                embed = Embed(
-                    title=f"Arrival Table",
-                    color = Colour.blue(),
-                    timestamp = ctx.message.created_at
-                )
+        embed = Embed(
+            title=f"Arrival Table",
+            color = VATADR_BLUE,
+        )
         for item in s['pilots']:
             if item['flight_plan'] != None:
-                if item['flight_plan']['arrival'] in airport:
+                if item['flight_plan']['arrival'] in airports:
                     try:
-                        
                         arrivals_exist = True
-                        #This is just a way to convert ICAO of BKPR to LYPR due to API differences in ICAO codes
+                        #This is just a way to convert airport of BKPR to LYPR due to API differences in airport codes
                         if item['flight_plan']['arrival'] == "BKPR":
                             arrival = "LYPR"
                         else:
                             arrival = item['flight_plan']['arrival']
+                            
                         airport_data_url = f"{url}{arrival}"
                         api_data = requests.get(airport_data_url).json()
                         resp = json.dumps(api_data)
@@ -257,35 +247,29 @@ class arrivals(Cog):
                             name=f"Failed to load arrivals",
                             value=f"{e}",
                             inline=False
-                        ) 
-                    await asyncio.sleep(0.5)
-                    embed.set_footer(
-                        text=f"Requested by {ctx.author.display_name}",
-                        icon_url=ctx.author.avatar_url
-                    )
-        if arrivals_exist:
-            await ctx.send(embed=embed)
-        else:
-            async with ctx.typing():
-                embed = Embed(
-                    title=f"Arrivals Table",
-                    color = Colour.blue(),
-                    timestamp = ctx.message.created_at
-                )
-                embed.add_field(
-                    name=f":x: No arrivals at the moment. :x:",
-                    value=f"\uFEFF",
-                    inline=False
-                )
-                embed.set_footer(
-                    text=f"Requested by {ctx.author.display_name}",
-                    icon_url=ctx.author.avatar_url
-                )
-                await ctx.send(embed=embed)
+                        )
+        if not arrivals_exist:
+            embed = Embed(
+                title=f"Arrival Table",
+                color = VATADR_RED
+            )
+            embed.add_field(
+                name=f":x: There is no arrivals at the moment :x:",
+                value="\uFEFF",
+                inline=False
+            )
 
-    @Cog.listener()
+            await interaction.followup.send(embed=embed)
+        else:
+
+            await interaction.followup.send(embed=embed)
+
+    @commands.Cog.listener()
     async def on_ready(self):
         print(f"{self.__class__.__name__} cog has been loaded.\n-----")
-
-def setup(bot):
-    bot.add_cog(arrivals(bot))   
+        
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(
+        Arrivals(bot),
+        guilds= [discord.Object(id=GUILD_ID)])
+        

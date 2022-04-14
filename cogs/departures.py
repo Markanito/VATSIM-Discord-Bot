@@ -1,51 +1,47 @@
-import asyncio
+from re import M
+import discord
 import requests
-import math
 import json
 import utils.json_loader
-from asyncio import sleep
+import math
+
 from datetime import datetime, date, time, timezone
-from discord.ext.commands import command, Cog
-from discord.ext.commands.core import cooldown
 from discord import Embed, Colour
-from discord.ext.commands.cooldowns import BucketType
+from discord import app_commands
+from discord.ext import commands
+from helpers.config import GUILD_ID, VATADR_BLUE, VATADR_RED
 
-airport = utils.json_loader.read_json("airports")
+airports = utils.json_loader.read_json("airports")
 
-class departures(Cog):
-    def __init__(self, bot):
+class Departures(commands.Cog):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-    
-    #Departures from selected airport
-    @command(name="departures", brief="Display all departures from <ICAO> airport! <ICAO> is requried!")
-    @cooldown(2, 60, BucketType.user)
-    async def departures(self, ctx, *, ICAO: str):
-        if len(ICAO.upper()) == 0:
-            await ctx.reply("Please provide ICAO code for an airport!")
 
-        if len(ICAO.upper()) > 4:
-            await ctx.reply("ICAO provided is not valid. Check ICAO code and try agin!")
-
-        if len(ICAO.upper()) < 4:
-            await ctx.reply("ICAO provided is not valid. Check ICAO code and try agin!")
-
-        if ICAO.upper() in airport:
+    @app_commands.command(
+        name="departures",
+        description="Get departers from desired airport"
+    )
+    async def departures(
+        self,
+        interaction: discord.Interaction,
+        airport: str,
+        private: bool = False
+    ) -> None:
+        await interaction.response.defer(thinking=True, ephemeral=private)
+        if airport.upper() in airport:
             t = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
             xy = json.dumps(t)
             s = json.loads(xy)
             departures_exist = False
-            async with ctx.typing():
-                embed = Embed(
-                    title=f"Departure Table for {ICAO.upper()}",
-                    color = Colour.orange(),
-                    timestamp = ctx.message.created_at
-                ) 
+            embed = Embed(
+                title=f"Departure Table for {airport.upper()}",
+                color = VATADR_BLUE
+            ) 
             for item in s['pilots']:
                 if item['flight_plan'] != None:
-                    if item['flight_plan']['departure'] == (ICAO.upper()):
-                        if item['groundspeed'] < 50:
+                    if item['flight_plan']['departure'] == (airport.upper()):
+                        if item['groundspeed'] < 30:
                             try:
-                                
                                 departures_exist = True
                                 callsign = item['callsign']
                                 departure = item['flight_plan']['departure']
@@ -66,50 +62,44 @@ class departures(Cog):
                                     value=f"{e}",
                                     inline=False  
                                 )
-                            embed.set_footer(
-                                text=f"Requested by {ctx.author.display_name}",
-                                icon_url=ctx.author.avatar_url
-                            )
             if departures_exist:
-                await ctx.send(embed=embed)
+                await interaction.followup.send(embed=embed)
             else:
-                async with ctx.typing():
-                    embed = Embed(
-                    title=f"Departure Table for {ICAO.upper()}",
-                    color = Colour.orange(),
-                    timestamp = ctx.message.created_at
-                    )
-                    embed.add_field(
-                        name=f":x: There is no departures at the moment :x:",
-                        value="\uFEFF",
-                        inline=False
-                    )
-                    embed.set_footer(
-                        text=f"Requested by {ctx.author.display_name}",
-                        icon_url=ctx.author.avatar_url
-                    )
-                    await ctx.send(embed=embed)
+                embed = Embed(
+                title=f"Departure Table for {airport.upper()}",
+                color = VATADR_RED
+                )
+                embed.add_field(
+                    name=f":x: There is no departures at the moment :x:",
+                    value="\uFEFF",
+                    inline=False
+                )
 
-    #All Departures
-    @command(name="alldepartures", description="Display all departures")
-    @cooldown(2, 60, BucketType.user)
-    async def alldepartures(self, ctx):
+                await interaction.followup.send(embed=embed)
+
+    @app_commands.command(
+        name="alldepartures",
+        description="Get all departures"
+    )
+    async def alldepartures(
+        self,
+        interaction = discord.Interaction,
+        private: bool = False
+    ):
+        await interaction.response.defer(thinking=True, ephemeral=private)
         data = requests.get('https://data.vatsim.net/v3/vatsim-data.json').json()
         resp = json.dumps(data)
         s = json.loads(resp)    
         deparutres_exist = False
-        async with ctx.typing():
-            embed = Embed(
-                title="Departure Table",
-                color = Colour.orange(),
-                timestamp = ctx.message.created_at
-            )
+        embed = Embed(
+            title="Departure Table",
+            color = VATADR_BLUE,
+        )
                     
         for item in s['pilots']:
             if item['flight_plan'] != None:
-                if item['flight_plan']['departure'] in airport:
-                    if item['groundspeed'] < 50:
-
+                if item['flight_plan']['departure'] in airports:
+                    if item['groundspeed'] < 30:
                         try:
                             deparutres_exist=True
                             callsign = item['callsign']
@@ -132,33 +122,27 @@ class departures(Cog):
                                 value=f"{e}",
                                 inline=False
                             )
-                        embed.set_footer(
-                            text=f"Requested by {ctx.author.display_name}",
-                            icon_url=ctx.author.avatar_url
-                        )
         if not deparutres_exist:
-            async with ctx.typing():
-                embed = Embed(
-                    title=f"Departure Table",
-                    color = Colour.orange(),
-                    timestamp = ctx.message.created_at
-                )
-                embed.add_field(
-                    name=f":x: There is no departures at the moment :x:",
-                    value="\uFEFF",
-                    inline=False
-                )
-                embed.set_footer(
-                    text=f"Requested by {ctx.author.display_name}",
-                    icon_url=ctx.author.avatar_url
-                )
-                await ctx.send(embed=embed)
-        else:
-            await ctx.send(embed=embed)
+            embed = Embed(
+                title=f"Departure Table",
+                color = VATADR_RED
+            )
+            embed.add_field(
+                name=f":x: There is no departures at the moment :x:",
+                value="\uFEFF",
+                inline=False
+            )
 
-    @Cog.listener()
+            await interaction.followup.send(embed=embed)
+        else:
+            await interaction.followup.send(embed=embed)
+
+    @commands.Cog.listener()
     async def on_ready(self):
         print(f"{self.__class__.__name__} cog has been loaded.\n-----")
         
-def setup(bot):
-    bot.add_cog(departures(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(
+        Departures(bot),
+        guilds= [discord.Object(id=GUILD_ID)])
+        

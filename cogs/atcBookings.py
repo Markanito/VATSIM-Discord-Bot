@@ -1,19 +1,17 @@
 import discord
-from discord.ext import tasks
-from discord.ext.commands import command, Cog
 import json
 import xml.etree.ElementTree as ET
 import requests
-from datetime import datetime, timezone, date, time
 import utils.json_loader
 
-bot_config_file = utils.json_loader.read_json("config")
-bookings_channel_id = bot_config_file["bookings_channel"]
+from discord.ext import tasks, commands
+from datetime import datetime, timezone, date, time
+from helpers.config import GUILD_ID, BOOKINGS_CHANNEL
 
 
 callsign_prefix = utils.json_loader.read_json("callsign_prefix")
-
 positions = ["GND","TWR","APP","CTR"]
+
 booked_cs = []
 
 class Controller():
@@ -31,8 +29,8 @@ class Controller():
     def get_bookings_end(self):
         return self.bookings_end
 
-class atcBookings(Cog):
-    def __init__(self, bot):
+class atcBookings(commands.Cog):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.newBooking.start()
 
@@ -76,7 +74,7 @@ class atcBookings(Cog):
                     bokembed.set_footer(
                         text =f"Booked by: {i.get_booked()}"
                         )
-                    channel = self.bot.get_channel(int(bookings_channel_id))
+                    channel = self.bot.get_channel(BOOKINGS_CHANNEL)
                     await channel.send(embed=bokembed)
 
             #Check if booking is removed!
@@ -88,14 +86,17 @@ class atcBookings(Cog):
                         booked_cs.remove(i)
                         bookremove = discord.Embed(title="VATAdria Booking Annoucement", description=f":x:`ATC Booking was removed!` :x:", color=0xff9500)
                         bookremove.add_field(name=":id: Callsign", value=f"{i}", inline=True)
-                        channel = self.bot.get_channel(int(bookings_channel_id))
+                        channel = self.bot.get_channel(BOOKINGS_CHANNEL)
                         await channel.send(embed=bookremove)
         except:
             pass
 
-    @Cog.listener()
+    @commands.Cog.listener()
     async def on_ready(self):
         print(f"{self.__class__.__name__} cog has been loaded\n-----")
 
-def setup(bot):
-    bot.add_cog(atcBookings(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(
+        atcBookings(bot),
+        guilds= [discord.Object(id=GUILD_ID)]
+    )

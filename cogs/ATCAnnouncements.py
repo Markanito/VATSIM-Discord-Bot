@@ -1,19 +1,18 @@
 import discord
-from discord import Embed
-from discord.ext.commands import Cog
-from discord.ext import tasks
-from datetime import datetime, timezone, date, timedelta
 import requests
 import time
 import json
+from helpers.config import GUILD_ID, ATC_CHANNEL
 import utils.json_loader
+
+from discord import Embed
+from discord.ext import tasks, commands
+from datetime import datetime, timezone, date, timedelta
+
 
 callsign_prefix = utils.json_loader.read_json("callsign_prefix")
 positions = ["GND","TWR","APP","CTR"]
 online_cs = []
-
-bot_config_file = utils.json_loader.read_json("config")
-atc_channel_id = bot_config_file["atc_channel"]
 
 class Controller():
     def __init__(self, callsign, controller_name, frequency):
@@ -27,8 +26,8 @@ class Controller():
     def get_frequency(self):
         return self.frequency
 
-class atcAnnoucements(Cog):
-    def __init__(self, bot):
+class atcAnnoucements(commands.Cog):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.atcAnnoucements.start()
 
@@ -72,7 +71,7 @@ class atcAnnoucements(Cog):
                         onlineEmbed.add_field(name=":man: Controller", value=f"`{i.get_controller_name()}`", inline=False)
                         onlineEmbed.add_field(name=":radio: Frequency", value=f"`{i.get_frequency()}`", inline=False)
                         onlineEmbed.set_footer(text=f"Logged on at: {time_logg}z")
-                        channel = self.bot.get_channel(int(atc_channel_id))
+                        channel = self.bot.get_channel(ATC_CHANNEL)
                         await channel.send(embed=onlineEmbed)
 
             #Controller Offline
@@ -81,13 +80,17 @@ class atcAnnoucements(Cog):
                     online_cs.remove(i)
                     offlineEmbed = Embed(title="ATC Announcement", description=f":x: `ATC Logged off! Hope to see you soon` :x:", color=0xff9500)
                     offlineEmbed.add_field(name=":id: Callsign", value=f"{i}", inline=True)
-                    channel = self.bot.get_channel(int(atc_channel_id))
+                    channel = self.bot.get_channel(int(ATC_CHANNEL))
                     await channel.send(embed=offlineEmbed)
         except:
             pass
 
-    @Cog.listener()
+    @commands.Cog.listener()
     async def on_ready(self):
         print(f"{self.__class__.__name__} cog has been loaded\n-----")
-def setup(bot):
-    bot.add_cog(atcAnnoucements(bot))
+        
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(
+        atcAnnoucements(bot),
+        guilds= [discord.Object(id=GUILD_ID)]
+    )

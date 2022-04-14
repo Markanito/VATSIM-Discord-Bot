@@ -1,8 +1,7 @@
 git+https://github.com/Rapptz/discord.py
 requests
-buttons
-textwrap
-contextlib
-discord
-json
 pytaf
+python-dotenv
+markdownify
+python-version
+emoji==1.6.3

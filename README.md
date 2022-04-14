@@ -34,18 +34,21 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-VATSIM Bot Developed by Marko Tomicic (VATSIM ID: 1359931). This bot started as an idea to bring certain data from VATSIM to Discord server in order to get data you need fast and on all devices. Bot started as simple Python script and now we are in V3 with a lot of functions that seemed imposible for me to design. 
+VATSIM Bot aka VATEye Developed by Marko Tomicic (VATSIM ID: 1359931). Bring nice features to your Discord server and let your member get to know your vACC/ARTCC better! With modern Discord features, integration alongiside VATSIM bot we make your life easier! 
 
 Here are features of this bot:
 * ATC & Bookings Annoucements
 * Arrivals & Departures
-* Custom Paginated Help command
-* Broadcast commands for Admins & Staff (used for Events, Annoucements, Sector files updates and news)
 * Load, unload & reload entire bot without the need to restart the bot
-* Decoded METAR
-* Easy customatization of bot (only input data in json files there is no need to touch the code)
+* Decoded METAR & TAF
+* Easy customatization of bot
+* Automatically assign Local Member roles to your members if they are part of your Subdivision
+* VATSIM Events API to post events reminders 2 hours before events
+* If user DM's your bot it will reply to it (if we have an answer for it) - Still in active development
 
-I spent a lot of time working on this project and experimenting with the performance and response time and I guess we are at the top of the line with this bot!
+I spent a lot of time going over Nextcord, Pycord and now when Discord.py is back in development it was time to update this bot.
+
+Big thanks to VATSIM-Scandinavia team for introducing me to Slash commands, Events posting and role assignement for users.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -77,8 +80,9 @@ This bot was built to be used by VATSIM vACC/ARTCC but I can't provide 1 bot you
 
 _In order to make this bot work you follow instructions step by step!!_
 _If you wish to use feature where bot will send few messages when it joins the server make sure to edit `cogs/on_server_join.py` with all your info and messages!_
-
-1. Create your bot on [Discord Developer POrtal](https://discord.com/developers/applications)
+_If you wish to disable any of the features of the bot locate `helpers/config.py` and remove any cogs you don't want to use from COGS array!_
+ 
+1. Create your bot on [Discord Developer Portal](https://discord.com/developers/applications)
 2. Get a free [CheckWX API Key](https://www.checkwxapi.com/)
 3. Clone the repo
    ```sh
@@ -92,40 +96,23 @@ _If you wish to use feature where bot will send few messages when it joins the s
       ```sh
     sudo pip install -r requirements.txt #Linux
    ```
-5. Enter your bot token in  `bot_config/secrets.json`
-   ```py
-    "token": 'ENTER YOUR TOKEN'
-   ```
-6. Edit config file in `bot_config/config.json` with all required data
-   ```py
-    "atc_channel": "781834455765483562",
-    "bookings_channel": "781834455765483562",
-    "events_channel": "692681048798265347",
-    "news_channel": "781834455765483562",
-    "sector_file_channel": "781834455765483562",
-    "checkwx_api_key": "0b955dec24ccb45ede04524bec",
-    "owner_id": "331516683258822658",
-    "staff_role_name": "Staff",
-    "discord_admin_role_name": "Admin",
-    "moderator_role_name": "Moderator",
-    "vatsim_api_key": ""
-   ```
-7. Enter airports ICAO code in `bot_config/airports.json`
+5. Create .env file and fill in all data from example .env
+6. Enter airports ICAO code in `bot_config/airports.json`
    ```py
     [
         "LJLJ", 
         "LJMB",
     }
    ```
-8. Enter ATC Callsigns in `bot_config/callsign_prefix.json`
+7. Enter ATC Callsigns in `bot_config/callsign_prefix.json`
    ```py
     [
         "LDZO", 
         "LYBA",
     }
    ```
-9. Run your bot by runing `python3.10 bot.py`
-10. Invite your bot to your server and have fun!
+8. Run your bot by runing `python3.10 bot.py`
+9. Invite your bot to your server and have fun! Make sure to grant it APPLICATION.COMMANDS scope before inviting the server or commands won't work at all!
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -160,9 +147,12 @@ There are some planned updates coming in the future which will happen soon or so
 Here is list of planned updates for now:
 - [X] Put all arrivals & all departures into single embed
 - [X] Put all bookings into single embed 
-- [ ] Add support for Slash commands
-- [ ] Switch to Discord.py v2
-- [ ] Implement VATSIM API usage
+- [X] Add support for Slash commands
+- [X] Switch to Discord.py v2
+- [X] Implement VATSIM API usage 
+- [X] Implement automatic events posting
+- [ ] Implement Auto Reponses for bot (few of them only working in DM)
+- [ ] Completely remove bot_config folder and switch to .env
 
 
 
