@@ -17,23 +17,26 @@ events_api_url = "https://my.vatsim.net/api/v1/events/all"
 events_cs = []
 
 class Events():
-    def __init__(self, title, start_time, end_time, description, picture):
+    def __init__(self, title, description, start_time, end_time, picture, link):
         self.title = title
+        self.description = description
         self.start_time = start_time
         self.end_time = end_time
-        self.description = description
         self.picture = picture
+        self.link = link
 
     def get_title(self):
         return self.title
+    def get_description(self):
+        return self.description
     def get_start_time(self):
         return self.start_time
     def get_end_time(self):
         return self.end_time
-    def get_description(self):
-        return self.description
     def get_picture(self):
         return self.picture
+    def get_link(self):
+        return self.link
 
 class EventsAnnouncement(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -55,47 +58,59 @@ class EventsAnnouncement(commands.Cog):
             #Check if any of our airports from Config is in json
             for airport in item['airports']:
                 if airport['icao'] in airports:
-                    #Define parameters which will be called in Events Embed post
+                    description = item['short_description']
+                    title = item['name']
                     start_time = datetime.strptime(item["start_time"], "%Y-%m-%dT%H:%M:%S.%fZ")
                     end_time = datetime.strptime(item["end_time"], "%Y-%m-%dT%H:%M:%S.%fZ")
-                    title = item['name']
-                    description = item['short_description']
                     picture = item['banner']
-                    start = start_time.strftime("%H:%M")
+                    event_link = item['link']
+                    
 
                     #Clean event description from HTML tags
                     clean = re.compile('<.*?>')
                     event_desc = re.sub(clean, '', description)
                     if start_time.date() == datetime.today().date():
-                        if (start_time.hour - datetime.now().hour) <=2:
-                            events_obj = Events(title, description, start_time, end_time, picture)
+                        if (start_time.hour - datetime.utcnow().hour) <=2:
+                            events_obj = Events(title, event_desc, start_time, end_time, picture, event_link)
                             events_2_obj.append(events_obj)
                             events_2_cs.append(title)
                     else:
                         pass
 
-                    for i in events_2_obj:
-                        if i.get_title() not in events_cs:
-                            events_cs.append(i.get_title())
-                            embed = Embed(
-                                title=f"{i.get_title()}",
-                                description=f"{event_desc}",
-                                color= VATADR_BLUE,
-                                url=item['link'],
-                            )
-                            embed.set_image(url=item['banner'])
-                            embed.set_footer(
-                                text=f'Starting time',
-                                icon_url='https://twemoji.maxcdn.com/v/latest/72x72/1f551.png'
-                            )
-                            channel = self.bot.get_channel(EVENTS_CHANNEL)
-                            message=f"<@&{EVENTS_ROLE}>\n:calendar_spiral: New event has been scheduled!"
-                            await channel.send(message, embed=embed)
-                    
+        for i in events_2_obj:
+            if i.get_title() not in events_cs:
+                events_cs.append(i.get_title())
+                embed = Embed(
+                    title=f"{i.get_title()}",
+                    description=f"{i.get_description()}",
+                    color= VATADR_BLUE,
+                    url=i.get_link(),
+                    timestamp=i.get_start_time()
+                )
+                event_start_time = i.get_start_time()
+                start = event_start_time.strftime("%H:%M")
+                embed.set_image(url=i.get_picture())
+                embed.set_footer(
+                    text=f'Starting time:',
+                    icon_url='https://twemoji.maxcdn.com/v/latest/72x72/1f551.png'
+                )
+                channel = self.bot.get_channel(EVENTS_CHANNEL)
+                message=f"<@&{EVENTS_ROLE}>\n:calendar_spiral: New event has been scheduled!"
+                await channel.send(message, embed=embed)
+
+                        
                     #Check if event is finished and remove it from memory
-                    for i in events_cs:
-                        if end_time.day < datetime.now().day:
-                            events_cs.remove(i)
+        for i in events_cs:
+            if end_time.day < datetime.now().day:
+                events_cs.remove(i)
+                channel = self.bot.get_channel(EVENTS_CHANNEL)
+                try:
+                    message = await channel.fetch_message(channel.last_message_id)
+                    await message.delete()
+                except:
+                    print(f"Did not find message id!")
+                    return
+                
     
     @events_posting.before_loop
     async def before_events_posting(self):
