@@ -8,8 +8,7 @@ import aiohttp
 
 from discord.ext import commands
 from dotenv import load_dotenv
-from helpers.config import VATADR_MEMBER_ROLE, VATSIM_MEMBER_ROLE, VATSIM_SUBDIVISION, GUILD_ID, BOT_TOKEN, REACTION_ROLES, REACTION_MESSAGE_IDS, REACTION_EMOJI, ROLE_REASONS
-from helpers.members import get_division_members
+from helpers.config import VATADR_MEMBER_ROLE, VATSIM_MEMBER_ROLE, VATSIM_SUBDIVISION, GUILD_ID, BOT_TOKEN, REACTION_ROLES, REACTION_MESSAGE_IDS, REACTION_EMOJI, ROLE_REASONS, APPLICATION_ID, VATSIM_CHECK_MEMBER_URL, VATSIM_API_TOKEN
 from helpers import config
 
 load_dotenv('env')
@@ -20,7 +19,7 @@ class VATEye(commands.Bot):
         super().__init__(
             command_prefix="!",
             intents=discord.Intents.all(),
-            application_id = 743941860178788452
+            application_id = APPLICATION_ID
         )
 
     async def setup_hook(self):
@@ -46,18 +45,21 @@ class VATEye(commands.Bot):
         vatadr_member = discord.utils.get(guild.roles, id=VATADR_MEMBER_ROLE)
         vatsim_member = discord.utils.get(guild.roles, id=VATSIM_MEMBER_ROLE)
 
+        request = requests.get(VATSIM_CHECK_MEMBER_URL, headers={'Authorization': 'Token ' + VATSIM_API_TOKEN})
+        if request.status_code == requests.codes.ok:
+            data = request.json()
+
         try:
             cid = re.findall('\d+', str(user.nick))
 
             if len(cid) < 1:
                 raise ValueError
 
-            api_data = await get_division_members()
 
             should_have_vatadr = False
 
-            for entry in api_data:
-                if int(entry['id']) == int(cid[0]) and str(entry["subdivision"]) == str(VATSIM_SUBDIVISION):
+            for item in data['results']:
+                if int(item['id']) == int(cid[0]) and str(item['subdivision']) == str(VATSIM_SUBDIVISION):
                     should_have_vatadr = True
 
             if vatsim_member in user.roles:
@@ -72,6 +74,7 @@ class VATEye(commands.Bot):
 
         except Exception as e:
             print(f"{e}")
+
 
 
 bot = VATEye()

@@ -65,6 +65,7 @@ ROLE_REASONS = {
 }
 
 BOT_TOKEN = str(os.getenv('BOT_TOKEN'))
+APPLICATION_ID = int(os.getenv('APPLICATION_ID'))
 VATSIM_API_TOKEN = str(os.getenv('VATSIM_API_TOKEN'))
 CHECKWX_API_KEY = str(os.getenv('CHECKWX_API_KEY'))
 

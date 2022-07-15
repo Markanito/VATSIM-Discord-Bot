@@ -112,7 +112,8 @@ _If you wish to disable any of the features of the bot locate `helpers/config.py
     }
    ```
 8. Run your bot by runing `python3.10 bot.py`
-9. Invite your bot to your server and have fun! Make sure to grant it APPLICATION.COMMANDS scope before inviting the server or commands won't work at all!
+9. Invite your bot to your server and have grant it APPLICATION.COMMANDS scope or slash commands won't work. Once bot joins the server run `[prefix]sync` command in order to sync all your commands with the server. If commands are not shown when you type / in any channel go to Server Settings -> Integrations -> VATEye and click on any command and disable the permissions, save it and re-enable it. Do this for all commands and Slash command should work now. This is Discord bug and not issue with the code and for now this has to be done if you have an issue with Slash commands not showing up.
+10. 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

@@ -4,15 +4,15 @@ import discord
 import requests
 import datetime
 
+
 from discord import app_commands
 from dotenv import load_dotenv
 from discord.ext import commands, tasks
 from helpers.message import staff_roles
-from helpers.members import get_division_members
-
-from helpers.config import VATSIM_MEMBER_ROLE, VATSIM_SUBDIVISION, CHECK_MEMBERS_INTERVAL, VATADR_MEMBER_ROLE, ROLE_REASONS, GUILD_ID
+from helpers.config import MENTOR_ROLE, VATSIM_MEMBER_ROLE, VATSIM_SUBDIVISION, CHECK_MEMBERS_INTERVAL, VATADR_MEMBER_ROLE, ROLE_REASONS, GUILD_ID, VATADR_ATC_ROLE, VATADR_STAFF_ROLE, VATADR_TRAINING_ROLE, VATADR_VISITING_ROLE, VATSIM_API_TOKEN, VATSIM_CHECK_MEMBER_URL
 
 load_dotenv('.env')
+
 
 
 class TasksCog(commands.Cog):
@@ -27,6 +27,7 @@ class TasksCog(commands.Cog):
 
     def cog_unload(self):
         self.check_members_loop.cancel()
+
 
     async def check_members(self, override=False):
         """
@@ -44,21 +45,21 @@ class TasksCog(commands.Cog):
         vatadr_member = discord.utils.get(guild.roles, id=VATADR_MEMBER_ROLE)
         vatsim_member = discord.utils.get(guild.roles, id=VATSIM_MEMBER_ROLE)
 
-        memberlist = await get_division_members()
+        request = requests.get(VATSIM_CHECK_MEMBER_URL, headers={'Authorization': 'Token ' + VATSIM_API_TOKEN})
+        if request.status_code == requests.codes.ok:
+            data = request.json()
             
         for user in users:            
             try:
                 cid = re.findall('\d+', str(user.nick))
 
+                should_have_vatadr = False
                 if len(cid) < 1:
                     raise ValueError
-
-                should_have_vatadr = False
-
-                for entry in memberlist:
-                    if int(entry['id']) == int(cid[0]) and str(entry["subdivision"]) == str(VATSIM_SUBDIVISION):
+                for item in data['results']:
+                    if int(item['id']) == int(cid[0]) and str(item['subdivision']) == str(VATSIM_SUBDIVISION):
                         should_have_vatadr = True
-
+                
                 if vatsim_member in user.roles:
                     if vatadr_member not in user.roles and should_have_vatadr == True:
                         await user.add_roles(vatadr_member, reason=self.vatadr_ROLE_ADD_REASON)
@@ -66,6 +67,8 @@ class TasksCog(commands.Cog):
                         await user.remove_roles(vatadr_member, reason=self.vatadr_ROLE_REMOVE_REASON)
                 elif vatsim_member not in user.roles and vatadr_member in user.roles:
                     await user.remove_roles(vatadr_member, reason=self.NO_AUTH_REMOVE_REASON)
+                
+                print(f"Assigned Local Member role to: {cid[0]}")
 
             except ValueError as e:
                 if vatadr_member in user.roles:
@@ -74,19 +77,21 @@ class TasksCog(commands.Cog):
                 print(e)
                 continue
 
+            
 
+                
         print("check_members finished at " + str(datetime.datetime.now().isoformat()))
 
 
     @tasks.loop(seconds=CHECK_MEMBERS_INTERVAL)
     async def check_members_loop(self):
         await self.check_members()
+
     
     @app_commands.command(
         name="checkusers",
         description="Refresh roles based on division membership"
     )
-    @commands.has_any_role(*staff_roles())
     async def user_check(
         self,
         interaction: discord.Interaction,

@@ -1,20 +1,49 @@
+from contextvars import Context
 import os
 import datetime
+from typing import Optional, Literal
 import discord
 
 from discord.ext import commands, tasks
-from discord import app_commands
+from discord import Object, app_commands
 from helpers.message import staff_roles, embed
-from helpers.config import COGS_LOAD, GUILD_ID, VATADR_BLUE, COGS
+from helpers.config import COGS_LOAD, GUILD_ID, STAFF_ROLES, VATADR_BLUE, COGS
 
 class Admin(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
+    @commands.command()
+    @commands.is_owner()
+    async def sync(self, ctx: Context, guilds: commands.Greedy[Object], spec: Optional[Literal["~"]] = None) -> None:
+        """Command to sync all commands to a guild. This is required since there is bug with discord where Slash commands are not registered."""
+        if not guilds:
+            if spec == "~":
+                fmt = await ctx.bot.tree.sync(guild=ctx.guild)
+            elif spec == "*":
+                ctx.bot.treee.copy_global_to(guild=ctx.guild)
+                fmt = await ctx.bot.tree.sync(guild=ctx.guild)
+            else:
+                fmt = await ctx.bot.tree.sync()
+
+            await ctx.send(f"Synced {len(fmt)} commands {'globally' if spec is None else 'to the current guild.'}")
+
+            fmt = 0
+            for guild in guilds:
+                try:
+                    await ctx.bot.tree.sync(guild=guild)
+                except discord.HTTPException:
+                    pass
+                else:
+                    fmt += 1
+                
+            await ctx.send(f"Synced the tree to {fmt}/{len(guilds)} guilds")
+
     @app_commands.command(
         name="load",
         description="Load modules"
     )
+    @app_commands.checks.has_any_role(*staff_roles())
     async def load(
         self,
         interaction: discord.Interaction,
@@ -30,6 +59,7 @@ class Admin(commands.Cog):
         name="unload",
         description="Unload module"
     )
+    @app_commands.checks.has_any_role(*staff_roles())
     async def unload(
         self,
         interaction: discord.Interaction,
@@ -45,6 +75,7 @@ class Admin(commands.Cog):
         name="cogs",
         description="Display all available modules"
     )
+    @app_commands.checks.has_any_role(*staff_roles())
     async def cogs(
         self,
         interaction: discord.Interaction,
@@ -64,6 +95,7 @@ class Admin(commands.Cog):
         name="delete",
         description="Delete specific number of messages in the channel"
     )
+    @app_commands.checks.has_any_role(*staff_roles())
     async def delete(
         self,
         interaction: discord.Interaction,
